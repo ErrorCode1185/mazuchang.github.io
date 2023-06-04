@@ -20,30 +20,66 @@
     var CONFIG = {"hostname":"mazuchang.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":320,"display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="前行纵然步履维艰，你仍旧走在正确的道路上。">
-<meta property="og:type" content="website">
-<meta property="og:title" content="mazuchang">
-<meta property="og:url" content="https://mazuchang.github.io/index.html">
+  <meta name="description" content="从源码层面探究JVM类加载机制Java 的跨平台特性总所周知 Java 是一种具有“跨平台”特性的高级语言，通俗的来说就是通过 Java 编写出的应用程序，只需要编写一次代码，就可以在不同的系统上运行，开发者无需关心不同操作系统间机器码和指令集上的差异。这使得 Java 可以摆脱了硬件平台的束缚，真正实现了“一次编写，到处运行”的理想。 而 Java 之所以能实现这一点，都得益于 JVM 虚拟机的">
+<meta property="og:type" content="article">
+<meta property="og:title" content="多图预警 - 从源码层面探究JVM类加载机制">
+<meta property="og:url" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/index.html">
 <meta property="og:site_name" content="mazuchang">
-<meta property="og:description" content="前行纵然步履维艰，你仍旧走在正确的道路上。">
+<meta property="og:description" content="从源码层面探究JVM类加载机制Java 的跨平台特性总所周知 Java 是一种具有“跨平台”特性的高级语言，通俗的来说就是通过 Java 编写出的应用程序，只需要编写一次代码，就可以在不同的系统上运行，开发者无需关心不同操作系统间机器码和指令集上的差异。这使得 Java 可以摆脱了硬件平台的束缚，真正实现了“一次编写，到处运行”的理想。 而 Java 之所以能实现这一点，都得益于 JVM 虚拟机的">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685281550589.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685282622904.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685373452043.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685373779925.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685373974500.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685374595147.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685451649884.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685452625259.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685452782039.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685452875399.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685453042847.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685453240789.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685460800123.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685460903659.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685461866680.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685461918700.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685461962576.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685462101766.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685544140286.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685544229159.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685712386235.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685630104538.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685630330299.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685713619004.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685714403131.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685714527547.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685715005315.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685715350897.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685717761091.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685859995006.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685861196726.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685863789995.png">
+<meta property="article:published_time" content="2023-06-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-06-04T09:10:20.199Z">
 <meta property="article:author" content="mazuchang">
+<meta property="article:tag" content="JVM">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685281550589.png">
 
-<link rel="canonical" href="https://mazuchang.github.io/">
+<link rel="canonical" href="https://mazuchang.github.io/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/">
 
 
 <script id="page-configurations">
   // https://hexo.io/docs/variables.html
   CONFIG.page = {
     sidebar: "",
-    isHome : true,
-    isPost : false,
+    isHome : false,
+    isPost : true,
     lang   : 'zh-CN'
   };
 </script>
 
-  <title>mazuchang</title>
+  <title>多图预警 - 从源码层面探究JVM类加载机制 | mazuchang</title>
   
 
 
@@ -152,9 +188,10 @@
         <div class="content-wrap">
           
 
-          <div class="content index posts-expand">
+          <div class="content post posts-expand">
             
-      
+
+    
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
@@ -170,10 +207,9 @@
       <meta itemprop="name" content="mazuchang">
     </span>
       <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/" class="post-title-link" itemprop="url">多图预警 - 从源码层面探究JVM类加载机制</a>
-        </h2>
+        <h1 class="post-title" itemprop="name headline">
+          多图预警 - 从源码层面探究JVM类加载机制
+        </h1>
 
         <div class="post-meta">
             <span class="post-meta-item">
@@ -210,7 +246,7 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h1 id="从源码层面探究JVM类加载机制"><a href="#从源码层面探究JVM类加载机制" class="headerlink" title="从源码层面探究JVM类加载机制"></a>从源码层面探究JVM类加载机制</h1><h2 id="Java-的跨平台特性"><a href="#Java-的跨平台特性" class="headerlink" title="Java 的跨平台特性"></a>Java 的跨平台特性</h2><p>总所周知 Java 是一种具有“跨平台”特性的高级语言，通俗的来说就是通过 Java 编写出的应用程序，只需要编写一次代码，就可以在不同的系统上运行，开发者无需关心不同操作系统间机器码和指令集上的差异。这使得 Java 可以摆脱了硬件平台的束缚，真正实现了“一次编写，到处运行”的理想。</p>
+        <h1 id="从源码层面探究JVM类加载机制"><a href="#从源码层面探究JVM类加载机制" class="headerlink" title="从源码层面探究JVM类加载机制"></a>从源码层面探究JVM类加载机制</h1><h2 id="Java-的跨平台特性"><a href="#Java-的跨平台特性" class="headerlink" title="Java 的跨平台特性"></a>Java 的跨平台特性</h2><p>总所周知 Java 是一种具有“跨平台”特性的高级语言，通俗的来说就是通过 Java 编写出的应用程序，只需要编写一次代码，就可以在不同的系统上运行，开发者无需关心不同操作系统间机器码和指令集上的差异。这使得 Java 可以摆脱了硬件平台的束缚，真正实现了“一次编写，到处运行”的理想。</p>
 <p>而 Java 之所以能实现这一点，都得益于 JVM 虚拟机的设计。相信每一个 Java 初学者刚开始都曾通过命令行运行过 Java 程序，我们首先将编写好的代码保存到 .java 文件中，而后需要通过 javac 命令将 .java 文件编译成 .class 字节码文件，之后就可以通过 java 命令运行。而上述步骤中的字节码（ByteCode）就是支撑跨平台特性的基石。JVM 虚拟机通过解释字节码命令的方式执行应用程序，如果想要在不同操作系统下执行相同的字节码则只需下载对应操作系统版本的 JVM 即可。甚至于字节码本身，也可以由其他语言自主编译实现，只需符合 JVM 虚拟机的规范，都可以在 JVM 虚拟机上运行，如Clojure、Groovy、JRuby、Jython、Scala等等。</p>
 <p><img src="/2023/06/04/%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6/1685281550589.png" alt="1685281550589"></p>
 <h2 id="Java-类加载机制"><a href="#Java-类加载机制" class="headerlink" title="Java 类加载机制"></a>Java 类加载机制</h2><p>前面我们说到字节码是支撑 Java 跨平台特性的基石，类加载则是 Java 虚拟机把描述类的数据从 .class 文件加载到内存，并对数据进行校验、转换解析和初始化，最终形成可以被虚拟机直接使用的 Java 类型的过程。</p>
@@ -327,213 +363,33 @@
 </ol>
 <p>此外我们也可以“打破”双亲委派机制，也就是使用自定义的类加载器来对目标类进行加载。“打破”双亲委派机制的方式有很多种，其核心思想就是继承 ClassLoader 实现其 findClass()，关于这部分内容感兴趣的同学可以自行找案例运行，本文就不再过多赘述了。</p>
 
-      
     </div>
 
     
     
     
+
       <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
+          <div class="post-tags">
+              <a href="/tags/JVM/" rel="tag"># JVM</a>
+          </div>
 
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+        
 
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="mazuchang">
-      <meta itemprop="description" content="前行纵然步履维艰，你仍旧走在正确的道路上。">
-    </span>
 
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="mazuchang">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">从字节码层面理解JVM内存模型</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-05-25 00:00:00" itemprop="dateCreated datePublished" datetime="2023-05-25T00:00:00+08:00">2023-05-25</time>
-            </span>
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="far fa-calendar-check"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-06-04 10:57:23" itemprop="dateModified" datetime="2023-06-04T10:57:23+08:00">2023-06-04</time>
-              </span>
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-folder"></i>
-              </span>
-              <span class="post-meta-item-text">分类于</span>
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/" itemprop="url" rel="index"><span itemprop="name">java</span></a>
-                </span>
-                  ，
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
-                </span>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h1 id="从字节码层面理解JVM内存模型"><a href="#从字节码层面理解JVM内存模型" class="headerlink" title="从字节码层面理解JVM内存模型"></a>从字节码层面理解JVM内存模型</h1><h2 id="Java-技术体系"><a href="#Java-技术体系" class="headerlink" title="Java 技术体系"></a>Java 技术体系</h2><p>从传统意义上看，JCP官方定义的JAVA技术体系包括了以下几个组成部分：</p>
-<ul>
-<li>Java 程序设计语言</li>
-<li>各种硬件平台上的 Java 虚拟机实现</li>
-<li>Class 文件格式</li>
-<li>Java 类库 API</li>
-<li>来自商业机构和开源社区的第三方 Java 类库</li>
-</ul>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image1.jpg" alt="Java技术体系"> </p>
-<h3 id="功能划分"><a href="#功能划分" class="headerlink" title="功能划分"></a>功能划分</h3><p>如果将它们根据 Java 各组成部分的功能来进行划分，大致可分为 JDK，JRE，JVM</p>
-<ul>
-<li><p><strong>JDK</strong>（Java Development Kit，Java 开发工具包）</p>
-<p>JDK 是用于支持 Java 程序开发的最小环境，可以把 <code>Java 程序设计语言</code>、<code>Java 虚拟机</code>、<code>Java 类库</code>这三部分统称为 JDK ，通常也用 JDK 代指整个 Java 体系</p>
-</li>
-<li><p><strong>JRE</strong>（Java Runtime Environment，Java 运行时环境）</p>
-<p>JRE 是支持 Java程序运行的标准环境，可以把 <code>Java 类库API</code> 中的<code> Java SE API子集</code>和 Java 虚拟机这两部分统称为 JRE</p>
-</li>
-<li><p><strong>JVM</strong>（Java VirtualMachine，Java 虚拟机）</p>
-<p>本系列文章的主题，在此不做过多展开。</p>
-</li>
-</ul>
-<h3 id="技术划分"><a href="#技术划分" class="headerlink" title="技术划分"></a>技术划分</h3><p>如果将它们按照技术所服务的领域来划分，或者按照技术关注的重点业务来划分的话，大致可分为 Java Card、Java ME、Java SE、Java EE</p>
-<ul>
-<li><p><strong>Java Card</strong></p>
-<p>支持 Java 小程序（Applets）运行在小内存设备（如智能卡）上的平台</p>
-</li>
-<li><p><strong>Java ME</strong>（Micro Edition）</p>
-<p>支持 Java 程序运行在移动终端（手机、PDA）上的平台，对 Java API 有所精简，并加入了移动终端的针对性支持，在 JDK6 以前也被称为 J2ME</p>
-<blockquote>
-<p>主要使用 Java 语言开发程序的 Android 并不属于 Java ME</p>
-</blockquote>
-</li>
-<li><p><strong>Java SE</strong>（Standard Edition）</p>
-<p>支持面向桌面级应用（如 Windows 下的应用程序）的 Java 平台，提供完整的 Java 核心 API，在 JDK6 以前也被称为 J2SE</p>
-</li>
-<li><p><strong>Java EE</strong>（Enterprise Edition）</p>
-<p>支持使用多层架构的企业应用（如 ERP、MIS、CRM 应用）的 Java 平台，除了提供 Java SE API 外，还对其做了大量有针对性的扩充，并提供了相关的部署支持。在 JDK6 以前也被称为 J2EE</p>
-<blockquote>
-<p>Java EE 在 JDK10 以后被 Oracle 放弃，捐献给了 Eclipse 基金会管理，此后被称为 Jakarta EE</p>
-</blockquote>
-</li>
-</ul>
-<h2 id="Java-内存模型"><a href="#Java-内存模型" class="headerlink" title="Java 内存模型"></a>Java 内存模型</h2><p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image2.png" alt="1684164921357"></p>
-<p>这张图相信大家都不陌生，因此本文将不再就图上内容做详细介绍（书上都有，再介绍也不会比书上详细多少）。</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">CONSTANT_TEST</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">Test</span> <span class="variable">staticTest</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Test</span>();</span><br><span class="line">    <span class="keyword">public</span> Test test;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">        <span class="type">Test</span> <span class="variable">test</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Test</span>();</span><br><span class="line">        test.sum(a, b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
-
-<p>我们首先准备这样一个 Java 类，并反编译得到该类的字节码文件。接下来我将就字节码内容结合上图描述的内存模型介绍它们之间的关联关系。</p>
-<h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>打开反编译得到的字节码文件，最上面显示的一些类信息、魔数、主版本号、次版本号啥的，这些我们先按下不表。这一块内容后面有机会我们再详细讲解。</p>
-<p>我们首先看到 Constant pool，这一块描述的就是常量池：</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image3.png" alt="1684498105037"></p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image4.png" alt="1684498105037"></p>
-<p>常量池是方法区的一部分，我们可以将常量池看作 class 类的一个资源仓库，里面主要存放了 Java 类的<code>字面量</code>以及<code>符号引用</code>，这些资源在编译期就会生成，在<strong>类加载</strong>后会被存放在方法区的<strong>运行时常量池</strong>中。在后续的方法的执行，类的描述信息，都是通过索引去常量池中定位所需的资源。</p>
-<h3 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h3><p>再往下就是我们定义的三个成员变量，其中常量和静态变量是存放在方法区的常量池中的，这个我们上面也说过，这个地方唯一需要注意的是，实例变量是在堆中分配内存的，这一块没什么好说的我们继续往下看</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image5.png" alt="1684501050441"></p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image6.png" alt="1684504630529"></p>
-<h3 id="方法信息表"><a href="#方法信息表" class="headerlink" title="方法信息表"></a>方法信息表</h3><p>再往下就来到了本章的重点，方法信息表，首先我们先整体看一下方法信息表的结构以及内容</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image7.png" alt="1684501734091"></p>
-<p>这么大一长串的东西第一眼看过去的第一感觉是不是感觉跟 Java 代码很相似？其实 Java 代码最终的执行都是根据这上面的内容逐行执行的。接下来我们逐行分析。</p>
-<p>首先第一个方法： public Test(); 这是类默认生成的无参构造方法，flags 表示它的访问修饰符权限，默认也是 public 的。</p>
-<p>再往下是方法的 Code 属性，方法体编译后产生的字节码都放在这里面。其中 max_stark 表示的是方法的<code>最大操作数栈深度</code>，这里为 1 表示有一个值被压入了操作数栈，max_locals 表示的是<code>局部变量表变量的个数</code>，这里也是 1 说明局部变量表中也有一个值，args_size 该方法的<code>形参个数</code>。如果是实例方法，第一个形参是 this 引用。 </p>
-<p>接下来就是该方法内真正执行的操作（感觉再讲下去这篇文章就得改名叫字节码解析了），首先执行的第一个指令就是 aload_0 ，通过查 Java字节码指令集我们可以得知，该指令就是将当前调用方法栈帧中局部变量表索引位置为0的局部变量推送到操作数栈的栈顶，如果是实例方法，局部变量表中索引位置为0的区域存放的就是 this 引用。 </p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image8.png" alt="1684504938071"></p>
-<p>后面的两个指令一个是调用父类（也就是 Object 类）的初始化方法，一个是 return 也就是构造方法出栈，这个就不详细讲了。此外还有一个行号表  LineNumberTable 这玩意用来记录 Java 源代码行号与字节码行号（字节码偏移量）的对应关系，报错的时候能显示异常发生在第几行第几个字符，以及打断点调试程序，依靠的就是这玩意。</p>
-<p>在前面分析完构造函数执行的指令后，再看其他函数其实大致都是一样的。下面我们如法炮制，分析 sum() 和 main() 函数都做了哪些事情。</p>
-<p>从它们调用关系出发，我们首先来分析 main() 方法：</p>
-<p>iconst_1：将 int 类型常量 1 压入操作数栈，这里需要提一嘴，JVM 中的常量都存放在方法区的常量池中，将一个常量加载到操作数栈的指令有很多，在不同的取值范围下都有不同的指令用于操作，各位感兴趣可以自行了解一下</p>
-<p>istore_1：将操作数栈中 int 类型值存入局部变量 1（非静态函数局部变量表 0 为this，只读）</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image9.png" alt="1684647925043"></p>
-<p>在所有变量都赋值完毕后，接下来通过 new 指令开始创建对象，并将创建的对象地址压入操作数栈顶，这里的 new 指令指向了上面常量池中的 #2 位置，大家可以自行到常量池中查找一下，对应的就是 Test 这个类。创建对象的时候 JVM 会进行一系列的复杂操作，比如最为大家熟知的五个步骤：类加载检查、分配内存、初始化、设置对象头、执行 &lt;init&gt; 方法，这个我们放在后面的章节中再详细介绍。在本章我们只做简要描述：</p>
-<p>在通过 new 指令创建对象时，JVM 会首先通过类加载检查判断该类有没有被 JVM 加载（其实就是在方法区定位一个类的类信息），如果没有的话就会先进行类加载，在类加载阶段会为指定类在元数据区生成一个 Klass 模型用于表示该 Java 类，主要包括了类的常量池、字段、方法等信息 （对于普通的 Java 类 JVM 创建的是 InstanceKlass，数组创建的是 ArrayKlass），在真正创建对象的时候，JVM 会在堆区创建一个 OopDesc 实例来表示这个对象，该对象中包含了类的对象头和元数据信息，并在对象元数据区通过一个 klassPoint 指向方法区的类元信息，也就是该类的 Klass 模型，同时在堆区还会生成一个该类的 MirrorKlass 用于存储 Class 对象（也就是我们通过反射可以获取到的），同时在 Klass 中会通过一个指针指向堆区的 MirrorKlass 对象。这一段有点绕，我们画图解释：</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image10.png" alt="1684650978479"></p>
-<p>执行完上述步骤后，对象就算真正创建完了，并且在操作数栈中也保存了一个该类对象的引用。</p>
-<p>接下来执行的是 dup 指令，该指令复制操作数栈顶值，并将其压入操作数栈，此时操作数栈中就存在了两个 test 对象实例，在下面的 invokespecial 指令执行的时候，又会将栈顶的 test 实例弹栈，并调用该对象的 init() 初始化对象。 初始化完成后通过 astore_3 指令将该对象的引用保存到局部变量表中，之后 aload_3 指令又会从局部变量表中将该对象引用压入操作数栈（iload_1，iload_2 同理），之后就是通过 invokevirtual 指令调用 sum() 方法，执行完后将 sum() 方法栈帧弹出虚拟机栈，之后返回。</p>
-<p>最后再说下 sum() 方法的执行，这个就很简单了，就是一个求和操作。跟构造函数一样，在执行到 iload_1，iload_2 指令时，就是将局部变量表索引位置 1，2 地址的局部变量加载到操作数栈，接下来通过 iadd 指令进行加法运算（这两个操作数最终会被加载到CPU寄存器，由CPU进行运算处理），之后就是 ireturn 将计算之后的结果返回到main()，至此整个字节码文件我们就分析得差不多了。</p>
-<h3 id="扩展：常量池详解"><a href="#扩展：常量池详解" class="headerlink" title="扩展：常量池详解"></a>扩展：常量池详解</h3><p>前面我们提到常量池可以看作 class 类的一个资源仓库，里面主要存放了 Java 类的<code>字面量</code>以及<code>符号引用</code>以及提到了运行时常量池的概念，那相信有些同学可能对这些概念还有些模糊，因此在文章的结尾我再多提一嘴，这块内容也是面试中经常被问到的。</p>
-<h4 id="字面量和符号引用"><a href="#字面量和符号引用" class="headerlink" title="字面量和符号引用"></a>字面量和符号引用</h4><p>首先解释一下字面量和符号引用的概念：</p>
-<h5 id="字面量"><a href="#字面量" class="headerlink" title="字面量"></a>字面量</h5><p>类似于 Java 中的常量，像字母、数字等构成的字符串或者数值常量、被声明为 final 的常量值等都可以被称为字面量。例如：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line"><span class="type">String</span> <span class="variable">s</span> <span class="operator">=</span> <span class="string">&quot;1&quot;</span>;</span><br></pre></td></tr></table></figure>
-
-<h5 id="符号引用"><a href="#符号引用" class="headerlink" title="符号引用"></a>符号引用</h5><p>符号引用是属于编译原理方面的概念，包含了下面三类常量：</p>
-<ul>
-<li>类和接口的全限定名（Fully Qualified Name）</li>
-<li>字段的名称和描述符（Descriptor）</li>
-<li>方法的名称和描述符</li>
-</ul>
-<p>这些符号引用在编译期保存的只是静态信息，也就是说，在 Class 文件中不会保存各个方法和字段的最终内存布局信息，因此这些字段和方法的符号引用不经过转换的话是无法直接被虚拟机使用的。当虚拟机运行时，需要从常量池获得对应的符号引用，再在类创建时或运行时解析并翻译到具体的内存地址之中。只有到运行时被加载到内存后，这些符号才有对应的内存地址信息，这些常量池一旦被装入内存就变成<strong>运行时常量池</strong>，对应的符号引用在程序加载或运行时会被转变为被加载到内存区域的代码的直接引用。这个过程被为称为<strong>动态链接</strong>，符号引用转换成直接引用其实主要也是通过对象头里的类型指针去转换直接引用。</p>
-<h4 id="字符串常量池"><a href="#字符串常量池" class="headerlink" title="字符串常量池"></a>字符串常量池</h4><p>总所周知，字符串 String 是引用类型，在 JDK8 及以前 String 底层采用的是 char[]存储，而到了 JDK9 及以后开始改用 byte[] 加上编码标记节约空间。同时字符串做为最基础也是最常用的数据类型，如果每次使用都需要单独为字符串分配空间，显然是很不合理的。因此 JVM 为了提高性能和减少内存开销，在实例化字符串常量时进行了一些优化：</p>
-<p>为字符串单独开辟一块空间，用于缓存字符串，这块空间也被称作字符串常量池。在创建字符串时，如果池中已经包含一个等于此 String 对象的字符串，则返回代表池中这个字符串的 String 对象。否则，将此 String 对象包含的字符串添加到常量池中，并且返回此 String 对象的引用。字符串常量池底层是一个固定大小的HashTable，其本质上保存的是字符串对象的引用。</p>
-<p>此外关于字符串常量池的具体位置，在 JDK1.6、JDK1.7、JDK1.8及以后各有不同</p>
-<ul>
-<li><p>JDK1.6 及以前</p>
-<p>JDK1.6 及以前在 HotSport 虚拟机上还有永久代概念，运行时常量池被放在永久代，字符串常量池被放在运行时常量池中</p>
-</li>
-<li><p>JDK1.7</p>
-<p>在 JDK1.7 开始逐步放弃永久代，并逐步改为采用本地内存来实现方法区。此时字符串常量池从永久代被分离出来放到了堆中</p>
-</li>
-<li><p>JDK1.8 及之后</p>
-<p>在 JDK1.8 及以后完全废除了永久代概念，改为采用本地内存实现的元空间（Meta-space）来代替永久代。将原本存在永久代的运行时常量池、类型信息放到了元空间中，字符串常量池则依然在堆中</p>
-</li>
-</ul>
-<p>下面贴一段书中的代码，通过在不同 JDK 版本下运行以下代码即可得到验证：</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment">* VM Args：-XX:PermSize=10M -XX:MaxPermSize=10M</span></span><br><span class="line"><span class="comment">* <span class="doctag">@author</span> zzm</span></span><br><span class="line"><span class="comment">*/</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">RuntimeConstantPoolOOM</span> &#123;</span><br><span class="line">  <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">    <span class="comment">// 使用List保持着常量池引用，避免Full GC回收常量池行为</span></span><br><span class="line">    List&lt;String&gt; list = <span class="keyword">new</span> <span class="title class_">ArrayList</span>&lt;String&gt;();</span><br><span class="line">    <span class="comment">// 10MB的PermSize在integer范围内足够产生OOM了</span></span><br><span class="line">    <span class="type">int</span> <span class="variable">i</span> <span class="operator">=</span> <span class="number">0</span>;</span><br><span class="line">    <span class="keyword">while</span> (<span class="literal">true</span>) &#123;</span><br><span class="line">    	list.add(String.valueOf(i++).intern());</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>在了解了上面的概念后，我们再来看一道比较常见的面试题：</p>
-<p>下面的代码创建了多少个 String 对象？</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="type">String</span> <span class="variable">s1</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">String</span>(<span class="string">&quot;he&quot;</span>) + <span class="keyword">new</span> <span class="title class_">String</span>(<span class="string">&quot;llo&quot;</span>);</span><br><span class="line"><span class="type">String</span> <span class="variable">s2</span> <span class="operator">=</span> s1.intern();</span><br><span class="line">System.out.println(s1 == s2);</span><br></pre></td></tr></table></figure>
-
-<p>答案是上面这段代码在  JDK 1.6 下输出是 false，创建了 6 个对象，而在 JDK 1.7 及以上的版本输出则是 true，创建了 5 个对象（不考虑 GC 情况）。之所以会产生这样的变化，主要还是字符串常量池从永久代脱离移入堆区的原因，从而导致 intern() 方法也相应发生了变化，下面我们通过两张图分别说明：</p>
-<h5 id="JDK1-6："><a href="#JDK1-6：" class="headerlink" title="JDK1.6："></a>JDK1.6：</h5><p>在 JDK1.6 时，由于有永久代的概念存在，当调用 intern() 时首先会从字符串常量池中取对应的字符串，如果该字符串存在字符串常量池中，就直接返回该字符串在字符串常量池中的引用；如果该字符串不在字符串常量池中，虚拟机首先会在永久代上重新创建一个该字符串的实例，将 StringTable 上的一个表项指向永久代上新创建的实例：</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image11.png" alt="1685004328811"></p>
-<h5 id="JDK1-7："><a href="#JDK1-7：" class="headerlink" title="JDK1.7："></a>JDK1.7：</h5><p>在 JDK1.7 之后，由于字符串常量池被移到了堆中，intern() 也相应的做出了一些改变，使得我们可以更方便地利用堆中的对象，此时如果字符串在字符串常量池中不存在，虚拟机就会首先在堆中创建一个该字符串的实例，而后将 StringTable 上的一个表项直接指向堆中的该字符串对象实例：</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image12.png" alt="1685004953311"></p>
-<h4 id="八大基本类型的包装类和对象池"><a href="#八大基本类型的包装类和对象池" class="headerlink" title="八大基本类型的包装类和对象池"></a>八大基本类型的包装类和对象池</h4><p>Java 中基本类型的包装类的大部分都实现了常量池技术(严格来说应该叫<strong>对象池</strong>，在堆上)，这些类是Byte，Short，Integer，Long，Character，Boolean另外两种浮点数类型的包装类Float、Double则没有实现。</p>
-<p>此外只有在当上述 5 种类型的包装类的取值范围在 -128 ~127 之间才会使用常量池，其他超出这个范围的对象都会在堆中重新开辟内存。 关于这点我们可以通过看 Integer.valueOf() 的源码得到验证（其他类型同理）：</p>
-<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/1685006129111.png" alt="1685006129111"></p>
-
-      
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" rel="prev" title="从字节码层面理解JVM内存模型">
+      <i class="fa fa-chevron-left"></i> 从字节码层面理解JVM内存模型
+    </a></div>
+      <div class="post-nav-item"></div>
     </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
       </footer>
+    
   </article>
   
   
-  
-
-
   
 
 
@@ -586,6 +442,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E4%BB%8E%E6%BA%90%E7%A0%81%E5%B1%82%E9%9D%A2%E6%8E%A2%E7%A9%B6JVM%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6"><span class="nav-number">1.</span> <span class="nav-text">从源码层面探究JVM类加载机制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-%E7%9A%84%E8%B7%A8%E5%B9%B3%E5%8F%B0%E7%89%B9%E6%80%A7"><span class="nav-number">1.1.</span> <span class="nav-text">Java 的跨平台特性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Java-%E7%B1%BB%E5%8A%A0%E8%BD%BD%E6%9C%BA%E5%88%B6"><span class="nav-number">1.2.</span> <span class="nav-text">Java 类加载机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E7%9A%84%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="nav-number">1.2.1.</span> <span class="nav-text">类的生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B"><span class="nav-number">1.2.2.</span> <span class="nav-text">类加载过程</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6"><span class="nav-number">1.3.</span> <span class="nav-text">双亲委派机制</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%BA%90%E7%A0%81%E8%A7%A3%E6%9E%90"><span class="nav-number">1.3.1.</span> <span class="nav-text">源码解析</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%88%9B%E5%BB%BA%E5%8F%8A%E5%88%9D%E5%A7%8B%E5%8C%96%E7%B1%BB%E5%8A%A0%E8%BD%BD%E5%99%A8"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">创建及初始化类加载器</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%B1%BB%E5%8A%A0%E8%BD%BD%E8%BF%87%E7%A8%8B-1"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">类加载过程</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%8F%8C%E4%BA%B2%E5%A7%94%E6%B4%BE%E6%9C%BA%E5%88%B6%E7%9A%84%E4%BD%9C%E7%94%A8"><span class="nav-number">1.3.2.</span> <span class="nav-text">双亲委派机制的作用</span></a></li></ol></li></ol></li></ol></div>
       </div>
       <!--/noindex-->
 
