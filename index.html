@@ -158,7 +158,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
+    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -172,7 +172,7 @@
       <header class="post-header">
         <h2 class="post-title" itemprop="name headline">
           
-            <a href="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">从字节码层面理解JVM内存模型</a>
+            <a href="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/" class="post-title-link" itemprop="url">从字节码层面理解JVM内存模型</a>
         </h2>
 
         <div class="post-meta">
@@ -182,14 +182,14 @@
               </span>
               <span class="post-meta-item-text">发表于</span>
 
-              <time title="创建时间：2023-05-20 21:00:51" itemprop="dateCreated datePublished" datetime="2023-05-20T21:00:51+08:00">2023-05-20</time>
+              <time title="创建时间：2023-05-25 00:00:00" itemprop="dateCreated datePublished" datetime="2023-05-25T00:00:00+08:00">2023-05-25</time>
             </span>
               <span class="post-meta-item">
                 <span class="post-meta-item-icon">
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2023-05-25 23:04:33" itemprop="dateModified" datetime="2023-05-25T23:04:33+08:00">2023-05-25</time>
+                <time title="修改时间：2023-06-04 10:57:23" itemprop="dateModified" datetime="2023-06-04T10:57:23+08:00">2023-06-04</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -201,7 +201,7 @@
                 </span>
                   ，
                 <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
-                  <a href="/categories/java/jvm/" itemprop="url" rel="index"><span itemprop="name">jvm</span></a>
+                  <a href="/categories/java/JVM/" itemprop="url" rel="index"><span itemprop="name">JVM</span></a>
                 </span>
             </span>
 
@@ -224,7 +224,7 @@
 <li>Java 类库 API</li>
 <li>来自商业机构和开源社区的第三方 Java 类库</li>
 </ul>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image1.jpg" alt="Java技术体系"> </p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image1.jpg" alt="Java技术体系"> </p>
 <h3 id="功能划分"><a href="#功能划分" class="headerlink" title="功能划分"></a>功能划分</h3><p>如果将它们根据 Java 各组成部分的功能来进行划分，大致可分为 JDK，JRE，JVM</p>
 <ul>
 <li><p><strong>JDK</strong>（Java Development Kit，Java 开发工具包）</p>
@@ -258,35 +258,35 @@
 </blockquote>
 </li>
 </ul>
-<h2 id="Java-内存模型"><a href="#Java-内存模型" class="headerlink" title="Java 内存模型"></a>Java 内存模型</h2><p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image2.png" alt="1684164921357"></p>
+<h2 id="Java-内存模型"><a href="#Java-内存模型" class="headerlink" title="Java 内存模型"></a>Java 内存模型</h2><p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image2.png" alt="1684164921357"></p>
 <p>这张图相信大家都不陌生，因此本文将不再就图上内容做详细介绍（书上都有，再介绍也不会比书上详细多少）。</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">class</span> <span class="title class_">Test</span> &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="type">int</span> <span class="variable">CONSTANT_TEST</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="type">Test</span> <span class="variable">staticTest</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Test</span>();</span><br><span class="line">    <span class="keyword">public</span> Test test;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="type">int</span> <span class="title function_">sum</span><span class="params">(<span class="type">int</span> a, <span class="type">int</span> b)</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> a + b;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title function_">main</span><span class="params">(String[] args)</span> &#123;</span><br><span class="line">        <span class="type">int</span> <span class="variable">a</span> <span class="operator">=</span> <span class="number">1</span>;</span><br><span class="line">        <span class="type">int</span> <span class="variable">b</span> <span class="operator">=</span> <span class="number">2</span>;</span><br><span class="line">        <span class="type">Test</span> <span class="variable">test</span> <span class="operator">=</span> <span class="keyword">new</span> <span class="title class_">Test</span>();</span><br><span class="line">        test.sum(a, b);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
 
 <p>我们首先准备这样一个 Java 类，并反编译得到该类的字节码文件。接下来我将就字节码内容结合上图描述的内存模型介绍它们之间的关联关系。</p>
 <h3 id="常量池"><a href="#常量池" class="headerlink" title="常量池"></a>常量池</h3><p>打开反编译得到的字节码文件，最上面显示的一些类信息、魔数、主版本号、次版本号啥的，这些我们先按下不表。这一块内容后面有机会我们再详细讲解。</p>
 <p>我们首先看到 Constant pool，这一块描述的就是常量池：</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image3.png" alt="1684498105037"></p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image4.png" alt="1684498105037"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image3.png" alt="1684498105037"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image4.png" alt="1684498105037"></p>
 <p>常量池是方法区的一部分，我们可以将常量池看作 class 类的一个资源仓库，里面主要存放了 Java 类的<code>字面量</code>以及<code>符号引用</code>，这些资源在编译期就会生成，在<strong>类加载</strong>后会被存放在方法区的<strong>运行时常量池</strong>中。在后续的方法的执行，类的描述信息，都是通过索引去常量池中定位所需的资源。</p>
 <h3 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h3><p>再往下就是我们定义的三个成员变量，其中常量和静态变量是存放在方法区的常量池中的，这个我们上面也说过，这个地方唯一需要注意的是，实例变量是在堆中分配内存的，这一块没什么好说的我们继续往下看</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image5.png" alt="1684501050441"></p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image6.png" alt="1684504630529"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image5.png" alt="1684501050441"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image6.png" alt="1684504630529"></p>
 <h3 id="方法信息表"><a href="#方法信息表" class="headerlink" title="方法信息表"></a>方法信息表</h3><p>再往下就来到了本章的重点，方法信息表，首先我们先整体看一下方法信息表的结构以及内容</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image7.png" alt="1684501734091"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image7.png" alt="1684501734091"></p>
 <p>这么大一长串的东西第一眼看过去的第一感觉是不是感觉跟 Java 代码很相似？其实 Java 代码最终的执行都是根据这上面的内容逐行执行的。接下来我们逐行分析。</p>
 <p>首先第一个方法： public Test(); 这是类默认生成的无参构造方法，flags 表示它的访问修饰符权限，默认也是 public 的。</p>
 <p>再往下是方法的 Code 属性，方法体编译后产生的字节码都放在这里面。其中 max_stark 表示的是方法的<code>最大操作数栈深度</code>，这里为 1 表示有一个值被压入了操作数栈，max_locals 表示的是<code>局部变量表变量的个数</code>，这里也是 1 说明局部变量表中也有一个值，args_size 该方法的<code>形参个数</code>。如果是实例方法，第一个形参是 this 引用。 </p>
 <p>接下来就是该方法内真正执行的操作（感觉再讲下去这篇文章就得改名叫字节码解析了），首先执行的第一个指令就是 aload_0 ，通过查 Java字节码指令集我们可以得知，该指令就是将当前调用方法栈帧中局部变量表索引位置为0的局部变量推送到操作数栈的栈顶，如果是实例方法，局部变量表中索引位置为0的区域存放的就是 this 引用。 </p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image8.png" alt="1684504938071"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image8.png" alt="1684504938071"></p>
 <p>后面的两个指令一个是调用父类（也就是 Object 类）的初始化方法，一个是 return 也就是构造方法出栈，这个就不详细讲了。此外还有一个行号表  LineNumberTable 这玩意用来记录 Java 源代码行号与字节码行号（字节码偏移量）的对应关系，报错的时候能显示异常发生在第几行第几个字符，以及打断点调试程序，依靠的就是这玩意。</p>
 <p>在前面分析完构造函数执行的指令后，再看其他函数其实大致都是一样的。下面我们如法炮制，分析 sum() 和 main() 函数都做了哪些事情。</p>
 <p>从它们调用关系出发，我们首先来分析 main() 方法：</p>
 <p>iconst_1：将 int 类型常量 1 压入操作数栈，这里需要提一嘴，JVM 中的常量都存放在方法区的常量池中，将一个常量加载到操作数栈的指令有很多，在不同的取值范围下都有不同的指令用于操作，各位感兴趣可以自行了解一下</p>
 <p>istore_1：将操作数栈中 int 类型值存入局部变量 1（非静态函数局部变量表 0 为this，只读）</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image9.png" alt="1684647925043"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image9.png" alt="1684647925043"></p>
 <p>在所有变量都赋值完毕后，接下来通过 new 指令开始创建对象，并将创建的对象地址压入操作数栈顶，这里的 new 指令指向了上面常量池中的 #2 位置，大家可以自行到常量池中查找一下，对应的就是 Test 这个类。创建对象的时候 JVM 会进行一系列的复杂操作，比如最为大家熟知的五个步骤：类加载检查、分配内存、初始化、设置对象头、执行 &lt;init&gt; 方法，这个我们放在后面的章节中再详细介绍。在本章我们只做简要描述：</p>
-<p>在通过 new 指令创建对象时，JVM 会首先通过类加载检查判断该类有没有被 JVM 加载（其实就是在方法区定位一个类的类元信息），如果没有的话就会先进行类加载，在类加载阶段会为指定类在元数据区生成一个 Klass 模型用于表示该 Java 类，主要包括了类的常量池、字段、方法等信息 （对于普通的 Java 类 JVM 创建的是 InstanceKlass，数组创建的是 ArrayKlass），在真正创建对象的时候，JVM 会在堆区创建一个 OopDesc 实例来表示这个对象，该对象中包含了类的对象头和元数据信息，并在对象元数据区通过一个 klassPoint 指向方法区的类元信息，也就是该类的 Klass 模型，同时在堆区还会生成一个该类的 MirrorKlass 用于存储 Class 对象（也就是我们通过反射可以获取到的），同时在 Klass 中会通过一个指针指向堆区的 MirrorKlass 对象。这一段有点绕，我们画图解释：</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image10.png" alt="1684650978479"></p>
+<p>在通过 new 指令创建对象时，JVM 会首先通过类加载检查判断该类有没有被 JVM 加载（其实就是在方法区定位一个类的类信息），如果没有的话就会先进行类加载，在类加载阶段会为指定类在元数据区生成一个 Klass 模型用于表示该 Java 类，主要包括了类的常量池、字段、方法等信息 （对于普通的 Java 类 JVM 创建的是 InstanceKlass，数组创建的是 ArrayKlass），在真正创建对象的时候，JVM 会在堆区创建一个 OopDesc 实例来表示这个对象，该对象中包含了类的对象头和元数据信息，并在对象元数据区通过一个 klassPoint 指向方法区的类元信息，也就是该类的 Klass 模型，同时在堆区还会生成一个该类的 MirrorKlass 用于存储 Class 对象（也就是我们通过反射可以获取到的），同时在 Klass 中会通过一个指针指向堆区的 MirrorKlass 对象。这一段有点绕，我们画图解释：</p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image10.png" alt="1684650978479"></p>
 <p>执行完上述步骤后，对象就算真正创建完了，并且在操作数栈中也保存了一个该类对象的引用。</p>
 <p>接下来执行的是 dup 指令，该指令复制操作数栈顶值，并将其压入操作数栈，此时操作数栈中就存在了两个 test 对象实例，在下面的 invokespecial 指令执行的时候，又会将栈顶的 test 实例弹栈，并调用该对象的 init() 初始化对象。 初始化完成后通过 astore_3 指令将该对象的引用保存到局部变量表中，之后 aload_3 指令又会从局部变量表中将该对象引用压入操作数栈（iload_1，iload_2 同理），之后就是通过 invokevirtual 指令调用 sum() 方法，执行完后将 sum() 方法栈帧弹出虚拟机栈，之后返回。</p>
 <p>最后再说下 sum() 方法的执行，这个就很简单了，就是一个求和操作。跟构造函数一样，在执行到 iload_1，iload_2 指令时，就是将局部变量表索引位置 1，2 地址的局部变量加载到操作数栈，接下来通过 iadd 指令进行加法运算（这两个操作数最终会被加载到CPU寄存器，由CPU进行运算处理），之后就是 ireturn 将计算之后的结果返回到main()，至此整个字节码文件我们就分析得差不多了。</p>
@@ -325,82 +325,12 @@
 
 <p>答案是上面这段代码在  JDK 1.6 下输出是 false，创建了 6 个对象，而在 JDK 1.7 及以上的版本输出则是 true，创建了 5 个对象（不考虑 GC 情况）。之所以会产生这样的变化，主要还是字符串常量池从永久代脱离移入堆区的原因，从而导致 intern() 方法也相应发生了变化，下面我们通过两张图分别说明：</p>
 <h5 id="JDK1-6："><a href="#JDK1-6：" class="headerlink" title="JDK1.6："></a>JDK1.6：</h5><p>在 JDK1.6 时，由于有永久代的概念存在，当调用 intern() 时首先会从字符串常量池中取对应的字符串，如果该字符串存在字符串常量池中，就直接返回该字符串在字符串常量池中的引用；如果该字符串不在字符串常量池中，虚拟机首先会在永久代上重新创建一个该字符串的实例，将 StringTable 上的一个表项指向永久代上新创建的实例：</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/1685004328811.png" alt="1685004328811"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image11.png" alt="1685004328811"></p>
 <h5 id="JDK1-7："><a href="#JDK1-7：" class="headerlink" title="JDK1.7："></a>JDK1.7：</h5><p>在 JDK1.7 之后，由于字符串常量池被移到了堆中，intern() 也相应的做出了一些改变，使得我们可以更方便地利用堆中的对象，此时如果字符串在字符串常量池中不存在，虚拟机就会首先在堆中创建一个该字符串的实例，而后将 StringTable 上的一个表项直接指向堆中的该字符串对象实例：</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/1685004953311.png" alt="1685004953311"></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/image12.png" alt="1685004953311"></p>
 <h4 id="八大基本类型的包装类和对象池"><a href="#八大基本类型的包装类和对象池" class="headerlink" title="八大基本类型的包装类和对象池"></a>八大基本类型的包装类和对象池</h4><p>Java 中基本类型的包装类的大部分都实现了常量池技术(严格来说应该叫<strong>对象池</strong>，在堆上)，这些类是Byte，Short，Integer，Long，Character，Boolean另外两种浮点数类型的包装类Float、Double则没有实现。</p>
 <p>此外只有在当上述 5 种类型的包装类的取值范围在 -128 ~127 之间才会使用常量池，其他超出这个范围的对象都会在堆中重新开辟内存。 关于这点我们可以通过看 Integer.valueOf() 的源码得到验证（其他类型同理）：</p>
-<p><img src="/2023/05/20/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/1685006129111.png" alt="1685006129111"></p>
-
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-        <div class="post-eof"></div>
-      </footer>
-  </article>
-  
-  
-  
-
-      
-  
-  
-  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/04/13/hello-world/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="image" content="/images/avatar.gif">
-      <meta itemprop="name" content="mazuchang">
-      <meta itemprop="description" content="前行纵然步履维艰，你仍旧走在正确的道路上。">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="mazuchang">
-    </span>
-      <header class="post-header">
-        <h2 class="post-title" itemprop="name headline">
-          
-            <a href="/2023/04/13/hello-world/" class="post-title-link" itemprop="url">Hello World</a>
-        </h2>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="far fa-calendar"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              <time title="创建时间：2023-04-13 15:45:41" itemprop="dateCreated datePublished" datetime="2023-04-13T15:45:41+08:00">2023-04-13</time>
-            </span>
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+<p><img src="/2023/05/25/%E4%BB%8E%E5%AD%97%E8%8A%82%E7%A0%81%E5%B1%82%E9%9D%A2%E7%90%86%E8%A7%A3JVM%E5%86%85%E5%AD%98%E6%A8%A1%E5%9E%8B/1685006129111.png" alt="1685006129111"></p>
 
       
     </div>
@@ -482,7 +412,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">1</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
