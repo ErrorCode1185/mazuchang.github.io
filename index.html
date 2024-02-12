@@ -158,6 +158,522 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="mazuchang">
+      <meta itemprop="description" content="前行纵然步履维艰，你仍旧走在正确的道路上。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="mazuchang">
+    </span>
+      <header class="post-header">
+        <h2 class="post-title" itemprop="name headline">
+          
+            <a href="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/" class="post-title-link" itemprop="url">传输层</a>
+        </h2>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-08-20 00:00:00" itemprop="dateCreated datePublished" datetime="2023-08-20T00:00:00+08:00">2023-08-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-02-12 17:55:53" itemprop="dateModified" datetime="2024-02-12T17:55:53+08:00">2024-02-12</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h1 id="传输层"><a href="#传输层" class="headerlink" title="传输层"></a>传输层</h1><h2 id="概述和传输层服务"><a href="#概述和传输层服务" class="headerlink" title="概述和传输层服务"></a>概述和传输层服务</h2><p>传输层服务是一种为运行在不同主机上的应用进程提供<strong>逻辑通信</strong>的服务。</p>
+<p>传输协议运行在端系统，发送方负责将应用层的报文分成<strong>报文段</strong>，然后传递给网络层，接收方负责将报文段重组成报文，然后传递给应用层。传输层有多种协议可供选择 —— Internet：TCP 和 UDP</p>
+<p>相比于负责主机间的逻辑通信的网络层服务来说，传输层服务负责的是进程间的逻辑通信，传输层依赖于网络层的服务，并对网络层的服务进行增强</p>
+<h3 id="Internet传输层协议"><a href="#Internet传输层协议" class="headerlink" title="Internet传输层协议"></a>Internet传输层协议</h3><p>互联网传输层协议（Transport Layer Protocol）是网络通信体系结构中的一层，主要负责在端到端的通信中提供可靠的数据传输服务。它通过一系列机制和算法在不可靠的网络环境下提供可靠的数据传输服务。</p>
+<h4 id="UDP-or-TCP"><a href="#UDP-or-TCP" class="headerlink" title="UDP or TCP"></a>UDP or TCP</h4><p>UDP（User Datagram Protocol）和 TCP（Transmission Control Protocol）是传输层协议中两种常用的协议，UDP 为要调用它的应用程序提供了一种不可靠的、无连接的服务。而 TCP 则截然相反，接下来我们从几个方面对比 UDP 与 TCP 的区别。</p>
+<h5 id="分段和重组"><a href="#分段和重组" class="headerlink" title="分段和重组"></a>分段和重组</h5><p>传输层协议将应用层产生的数据进行分段，以适应网络传输的要求。在接收端，传输层协议负责将这些分段重新组合成完整的数据。</p>
+<ul>
+<li><strong>UDP</strong>：UDP 不对数据进行分段和重组，将应用程序发送的数据作为一个整体发送，接收端直接将数据交给应用程序处理。</li>
+<li><strong>TCP</strong>：TCP 会将应用程序发送的数据按照最大报文段长度（MSS）进行分段，并在接收端进行重组，以适应网络传输的要求。</li>
+</ul>
+<h5 id="建立与管理连接"><a href="#建立与管理连接" class="headerlink" title="建立与管理连接"></a>建立与管理连接</h5><p>传输层协议通过连接的建立、维护和释放，确保通信双方能够可靠地交换数据。</p>
+<ul>
+<li><strong>UDP</strong>：UDP 是无连接的协议，通信双方之间不需要建立和维护连接。每次发送数据时都是独立的，不会保存连接状态信息。</li>
+<li><strong>TCP</strong>：TCP 是面向连接的协议，通信双方在传输数据之前需要通过三次握手建立连接，并在传输过程中维护连接状态信息。这样可以确保数据的可靠传输和有序接收。</li>
+</ul>
+<h5 id="流量控制和拥塞控制"><a href="#流量控制和拥塞控制" class="headerlink" title="流量控制和拥塞控制"></a>流量控制和拥塞控制</h5><p>传输层协议通过流量控制机制，调节发送端的数据发送速率，以适应接收端的处理能力。这可以防止数据包丢失或拥塞，确保数据能够稳定地到达目的地。</p>
+<ul>
+<li><strong>UDP</strong>：UDP 不提供流量控制和拥塞控制机制。发送端以固定速率发送数据，无法根据网络状况进行调整。这可能导致数据丢失或网络拥塞。 </li>
+<li><strong>TCP</strong>：TCP 具有流量控制和拥塞控制机制。通过滑动窗口、拥塞窗口等算法，TCP可以根据网络状况动态调整发送速率，避免数据丢失和网络拥塞，从而提供更好的服务质量。</li>
+</ul>
+<h5 id="差错检测和恢复"><a href="#差错检测和恢复" class="headerlink" title="差错检测和恢复"></a>差错检测和恢复</h5><p>传输层协议实施差错检测与纠正机制，例如校验和等，以保证数据的完整性和正确性。如果发现数据错误，传输层协议可请求重新传输或纠正错误。</p>
+<ul>
+<li><strong>UDP</strong>：UDP 提供了简单的差错检测功能，使用校验和来验证数据的完整性。但UDP无法进行差错恢复，即无法检测和纠正数据传输中的错误。</li>
+<li><strong>TCP</strong>：TCP 具有强大的差错检测和恢复机制。它使用序号、确认号和校验和等技术来保证数据的可靠传输，能够检测和纠正传输过程中的错误。</li>
+</ul>
+<h5 id="多路复用和多路分解"><a href="#多路复用和多路分解" class="headerlink" title="多路复用和多路分解"></a>多路复用和多路分解</h5><p>传输层协议支持多个应用程序同时使用网络资源进行数据传输。通过端口号，传输层协议将接收到的数据正确地交付给对应的应用程序。</p>
+<ul>
+<li><strong>UDP</strong>：UDP 不提供多路复用和多路分解功能，应用程序需要自行实现数据的分段和重组以及多路复用和分解。</li>
+<li><strong>TCP</strong>：TCP 通过使用源端口和目标端口配合序号和确认号，实现了多路复用和多路分解功能。在同一个主机上，多个应用程序可以同时使用同一个 IP 地址的不同端口进行通信。</li>
+</ul>
+<h5 id="提供服务质量-QoS-保证"><a href="#提供服务质量-QoS-保证" class="headerlink" title="提供服务质量(QoS)保证"></a>提供服务质量(QoS)保证</h5><p>传输层协议可以根据应用程序对服务质量的不同需求，提供相应的服务质量保证。例如，根据优先级排队、拥塞控制等机制，确保关键应用能够得到及时可靠的传输。 </p>
+<ul>
+<li><strong>UDP</strong>：UDP 本身不提供显式的 QoS 支持。但可以通过应用层协议自行实现一些 QoS 功能。</li>
+<li><strong>TCP</strong>：TCP 提供基于隐式 QoS 的服务。它通过拥塞控制和流量控制等机制，可以根据网络状况进行动态调整，提供较好的服务质量。</li>
+</ul>
+<h5 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h5><p>UDP 适用于对实时性要求高、数据丢失可以容忍的应用场景，如音频、视频流等。而 TCP 适用于对数据完整性和可靠性要求高的应用场景，如文件传输、网页浏览等。在选择协议时，需要根据应用的需求和网络环境的特点进行权衡和选择。</p>
+<h2 id="多路复用与解复用"><a href="#多路复用与解复用" class="headerlink" title="多路复用与解复用"></a>多路复用与解复用</h2><h3 id="发送端多路复用"><a href="#发送端多路复用" class="headerlink" title="发送端多路复用"></a>发送端多路复用</h3><p>多路复用（Multiplexing）是将多个独立的数据流合并到一个通信信道中进行传输的过程。发送端从多个套接字接受来自多个进程的报文，根据套接字对应的 IP 地址和端口号等信息对报文段用头部加以封装（该头部信息用于以后的解复用）【TCP 的时候要联合源IP、目标IP，源端口、目标端口来使用、来封装 TCP 报文段】</p>
+<h3 id="接收端多路解复用"><a href="#接收端多路解复用" class="headerlink" title="接收端多路解复用"></a>接收端多路解复用</h3><p>在接收端，通过多路解复用（Demultiplexing）将接收到的数据流从共享的通信信道中分离出来，以便正确地交付给相应的接收方进行处理。接收端会根据事先约定的标识信息（如端口号、协议标识等）判断每个数据块所属的数据流，并根据需要将这些数据块按序重组成原始的数据流。这样，接收方就能够根据报文段的头部信息中的 IP 地址和端口号将接收到的报文段发给正确的套接字（和对应的应用进程）【TCP 使用端口的方式和 UDP 使用端口的方式不太一样】 正确地还原和处理发送方发送的数据。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1690813509405.png" alt="1690813509405"></p>
+<h3 id="多路解复用工作原理"><a href="#多路解复用工作原理" class="headerlink" title="多路解复用工作原理"></a>多路解复用工作原理</h3><ul>
+<li><strong>解复用作用</strong>：TCP 或者 UDP 实体采用哪些信息，将报文段的数据部分交给正确的 socket，从而交给正确的进程</li>
+<li><strong>主机收到 IP 数据报</strong><ul>
+<li>每个数据报有源IP地址和目标地址</li>
+<li>每个数据报承载一个传输层报文段</li>
+<li>每个报文段有一个源端口号和目标端口号（特定应用有著名的端口号）</li>
+</ul>
+</li>
+<li>主机联合使用<strong>IP地址</strong>和<strong>端口号</strong>将报文段发送给合适的套接字</li>
+</ul>
+<h3 id="UDP多路复用解复用"><a href="#UDP多路复用解复用" class="headerlink" title="UDP多路复用解复用"></a>UDP多路复用解复用</h3><p>UDP 多路解复用首先需要使用 socket 库创建一个 UDP 套接字，并绑定到一个固定的本地地址和端口上：</p>
+<ul>
+<li><p><strong>服务器端</strong>：</p>
+<p>​	serverSocket &#x3D; socket(PF_INET, SOCK_DGRAM, 0);</p>
+<p>​	bind(serverSocket, &amp;sad, sizeof(sad));</p>
+<p>serverSocket 和 Sad 指定的端口号捆绑【服务器在创建本地的 socket 的时候只是和本地的 IP 和端口相捆绑】</p>
+</li>
+<li><p><strong>客户端</strong>：</p>
+<p>​	ClientSocket &#x3D; socket(PF_INET, SOCK_DGRAM, 0);</p>
+<p>没有 bind，ClientSocket 和 os 为之分配的某个端口号捆绑（客户端使用什么端口号无所谓，客户端主动找服务器）【隐含的 bind，客户端创建的整数和 IP 和端口也做了相捆绑，只不过没有指定 IP 和端口号而已，但是也是做了个捆绑】</p>
+</li>
+</ul>
+<p>在接收端，UDP 套接字使用二元组标识（目标 IP 地址、目标端口号）当主机收到 UDP 报文段首先会检查报文段的目标端口号，并用该端口号将报文段定位给套接字，如果两个不同源 IP 地址&#x2F;源端口号的数据报，但是有相同的目标 IP 地址和端口号，则被定位到相同的套接字。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1690986730367.png" alt="1690986730367"></p>
+<h3 id="TCP多路复用解复用"><a href="#TCP多路复用解复用" class="headerlink" title="TCP多路复用解复用"></a>TCP多路复用解复用</h3><p>TCP多路复用解复用与UDP类似，不同的是 TCP 套接字使用的是包含<code>源IP地址</code>，<code>源端口号</code>、<code>目的IP地址</code>、<code>目的端口号</code>的四元组本地标识，服务器能够在一个 TCP 端口上同时支持多个 TCP 套接字，每个套接字由其四元组标识（有不同的源 IP 和源 port），Web 服务器对每个连接客户端有不同的套接字（非持久对每个请求有不同的套接字），接收主机用四元组标识来将数据报定位到合适的套接字。一个 socket 四元组只要任何一个不一样就定位到不一样的 socket ，从而发给不同的应用进程。如果是一个多线程的话，可能是发给同一个进程下面的不一样的线程</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1690986756952.png" alt="1690986756952"></p>
+<h2 id="无连接传输：UDP"><a href="#无连接传输：UDP" class="headerlink" title="无连接传输：UDP"></a>无连接传输：UDP</h2><p>UDP是无连接的服务，发送端和接收端之间没有握手，每个UDP报文段都被独立的处理。UDP 被用于流媒体应用（丢失不敏感，速率敏感、应用可控制速率）、DNS、SNMP。若想要在 UDP上 实现可靠传输需要在应用层增加可靠性，使用应用内部特定的差错恢复。</p>
+<ul>
+<li>UDP：User Datagram Protocol [RFC 768] </li>
+<li>“no frills”,“bare bones”internet传输协议</li>
+</ul>
+<p>UDP 提供尽力而为的服务，报文段可能丢失，乱序。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691156959550.png" alt="1691156959550"></p>
+<p><strong>为什么要有UDP？</strong></p>
+<ul>
+<li><p>无需建立连接（建立连接会增加延时）</p>
+</li>
+<li><p>简单：在发送端和接收端没有连接状态</p>
+</li>
+<li><p>报文段的头部很小（开销小）</p>
+</li>
+<li><p>无拥塞控制和流量控制：UDP可以尽可能快的发送报文段</p>
+<p>应用 -&gt; 传输的速率 &#x3D; 主机 -&gt; 网络的速率</p>
+</li>
+</ul>
+<h4 id="UDP校验和"><a href="#UDP校验和" class="headerlink" title="UDP校验和"></a>UDP校验和</h4><p>目标：检测在被传输报文段中的差错（如比特反转）</p>
+<p><strong>发送方</strong></p>
+<ul>
+<li>将报文段的内容是为16位比特的整数</li>
+<li>校验和：报文段的校验和（1的补运算）</li>
+<li>发送方将校验和放在UDP的检验和字段</li>
+</ul>
+<p><strong>接收方</strong></p>
+<ul>
+<li>计算接收到的报文段和校验和</li>
+<li>检查计算出的校验和与校验和字段的内容是否相等<ul>
+<li>不相等 —— 检测到差错</li>
+<li>相等     —— 没有检测到差错，但也许还有残存错误</li>
+</ul>
+</li>
+</ul>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157036910.png" alt="1691157036910"></p>
+<h2 id="面向连接的传输：TCP"><a href="#面向连接的传输：TCP" class="headerlink" title="面向连接的传输：TCP"></a>面向连接的传输：TCP</h2><h3 id="TCP概述"><a href="#TCP概述" class="headerlink" title="TCP概述"></a>TCP概述</h3><ul>
+<li><p><strong>点对点的传输：</strong>一个发送方，一个接收方</p>
+</li>
+<li><p><strong>可靠的、按顺序的字节流：</strong>没有报文边界</p>
+</li>
+<li><p><strong>管道化（流水线）：</strong>TCP拥塞控制和流量控制设置窗口大小、</p>
+</li>
+<li><p><strong>全双工数据：</strong>在同一连接中数据流双向流动（MSS：最大报文段大小）</p>
+</li>
+<li><p><strong>面向连接：</strong>在数据交换之前，通过握手（交换控制报文）初始化发送方、接收方的状态变量</p>
+</li>
+<li><p><strong>有流量控制：</strong>发送方不会淹没接收方</p>
+</li>
+<li><p><strong>发送和接收缓存</strong></p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671959103196.png" alt="1671959103196"></p>
+</li>
+</ul>
+<h3 id="TCP报文段结构"><a href="#TCP报文段结构" class="headerlink" title="TCP报文段结构"></a>TCP报文段结构</h3><p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671934881656.png" alt="1671934881656"></p>
+<h4 id="TCP头包和数据构成"><a href="#TCP头包和数据构成" class="headerlink" title="TCP头包和数据构成"></a>TCP头包和数据构成</h4><p>TCP和UDP都有一个服务器和客户端的模型，对客户端端口和服务器端口来讲，服务器的端口一定要是被指定的，而客户端的端口可以自己分配给它，也可以由计算机或其他设备随机生成相应的端口号。 </p>
+<ol>
+<li><p><strong>序列号</strong>：sequence number 32bits </p>
+<p>(1.1）当SYN（flag）&#x3D; 1 时，这是一个初始序列号。 </p>
+<p>(1.2）当SYN &#x3D; 0 时，序列号代表的是这段数据中累加后的字节，也就是发送了多少个数据的字节。 </p>
+</li>
+<li><p><strong>确认号</strong>：Acknowledgement number 32bits </p>
+<p>(2.1）当ACK（flag）&#x3D;1时，确认号针对的是接受者所期望获得的下一个序列号是多少。</p>
+<p>(2.2）第一个ACK对初始的ISN是有确认的，但是对数据没有回应。 </p>
+</li>
+<li><p><strong>首部长度</strong>（数据偏移）：Data offset</p>
+<p>数据偏移主要代表的是TCP头包有多大的数量，一般的TCP头包的头数量是20bytes，有options和padding时，最大为60bytes。 </p>
+</li>
+<li><p><strong>状态位</strong>：Flags 9bits </p>
+<p>URG：紧急指针字段；<br>ACK：当ACK为1时，Acknowledgement number字段为1；<br>PSH：当PSH出现时，它要求接收者需要将接收道德数据尽快地提供给应用；<br>RST：当发送RST请求时，逻辑上的连接需要复位；<br>SYN：代表的是同步数据请求，在建立连接时会出现；<br>FIN：在连接终止时会出现。</p>
+<p>状态位还包括了ENC域（exploit congestion notification）：包括了CWR和ECE。<br>当一个IP包的ENC域被路由器设置为11时（CWR和ECE均为1），接收端而非发送端被通知路径上发生了拥塞。ECN使用TCP头部来告知发送端网络正在经历拥塞，并且告知接收端发送端已经收到了接收端发来的拥塞通告，已经降低了发送速率。</p>
+</li>
+<li><p><strong>接收窗口</strong>：window 16bits </p>
+<p>Window代表的是接收窗口提示，即可以接收的数据量是多少字节。 </p>
+</li>
+<li><p><strong>校验和</strong></p>
+<p>16位校验主要是为了在TCP中对头和数据都进行计算。 </p>
+</li>
+<li><p><strong>紧急数据指针</strong>：Urgent 16bits</p>
+<p>当flag中的URG置位后，16位的字段就是有意义的，这只是相对于序列号的一个偏移。 </p>
+</li>
+<li><p><strong>选项中的几种选择</strong>：Options 变长，最大40字节 </p>
+<p>（8.1）最大报文长度MSS（Maxium Segment Size），指的是一个TCP报文数据段的最大长度。要尽可能大一些但是又不需要IP拆分。<br>（8.2）窗口扩大选项。可用于控制传输窗口大小。<br>（8.3）时间戳。非常有用。可以用于计算往返时间RTT、区分重复报文。因为报文的序号只能是232-1个，所以很容易就重复了，加上时间戳可以进行区分。</p>
+</li>
+</ol>
+<blockquote>
+<p><strong>问</strong>：为何TCP字段没有length字段，而UDP有length字段？</p>
+<p><strong>答</strong>：TCP容纳不了一个长度字段，但接收端可以隐含计算出；UDP正好剩个位置容纳UDP长度字段，无须隐含计算。 </p>
+<p>对于网络协议来说，一端发送的协议报文，另外一端一定要有方法知道协议报文的长度！</p>
+</blockquote>
+<h4 id="发送序号和确认序号的含义"><a href="#发送序号和确认序号的含义" class="headerlink" title="发送序号和确认序号的含义"></a>发送序号和确认序号的含义</h4><p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671934881542.png" alt="1671934881542"></p>
+<p>发送序号和确认序号是实现可靠数据传输的重要组成部分，由于TCP提供的是字节流传输，因此每个字节都有一个序号用于唯一标识</p>
+<ul>
+<li><strong>序号：</strong>报文段<strong>首字节</strong>在字节流中的编号</li>
+<li><strong>确认序号：</strong>TCP采用累积确认，确认序号用来表示期望从对方接收的下一个字节的序号</li>
+</ul>
+<p>由于TCP提供的是全双工通信，A向B发送数据的同时，A可能也在从B接收数据，这种情况下A可以将反馈捎带在它发送给B的报文段中。 </p>
+<h4 id="重要的TCP选项"><a href="#重要的TCP选项" class="headerlink" title="重要的TCP选项"></a>重要的TCP选项</h4><ol>
+<li><p><strong>最大段长度 - MSS</strong></p>
+<p>（1.1）TCP段中可以携带的最大数据字节数</p>
+<p>（1.2）建立连接时，每个主机可声明自己能够接受的MSS，缺省为536字节。 </p>
+</li>
+<li><p><strong>窗口比例因子 - window scale</strong></p>
+<p>（2.1）建立连接时，双方可以协商一个窗口比例因子</p>
+<p>（2.2）实际接收窗口大小 &#x3D; window size * 2^window scale^。</p>
+</li>
+<li><p><strong>选择确认 - SACK</strong></p>
+<p>（3.1）最初的TCP协议只使用累积确认</p>
+<p>（3.2）改进的TCP协议引入选择确认，允许接收端指出缺失的数据字节。</p>
+</li>
+</ol>
+<h3 id="TCP可靠数据传输"><a href="#TCP可靠数据传输" class="headerlink" title="TCP可靠数据传输"></a>TCP可靠数据传输</h3><p>TCP在IP不可靠的尽力而为的服务之上创建了一种<strong>可靠数据传输服务</strong>。TCP的可靠数据传输服务可以确保一个进程从其接收缓存中读出的数据流是无损坏、无间隙、非冗余和按序的数据流；即该字节流与连接的另一方端系统发送出的字节流是完全相同的。</p>
+<h4 id="基本机制"><a href="#基本机制" class="headerlink" title="基本机制"></a>基本机制</h4><ul>
+<li>发送端：流水线式发送数据、等待确认、超时重传</li>
+<li>接收端：进行差错检测，采用积累确认机制</li>
+</ul>
+<p>对于乱序段的处理 TCP 协议中没有明确规定，接收端可以直接将乱序段抛弃，这样做的好处是简单，缺点是效率低；也可以将乱序段先缓存起来，这种方式效率高但处理复杂。</p>
+<h3 id="TCP流量控制"><a href="#TCP流量控制" class="headerlink" title="TCP流量控制"></a>TCP流量控制</h3><p>TCP 为应用程序提供了流量控制服务（flow-control service）可以将发送方的发送速率与接收方应用程序的读取速率相匹配，以消除发送方报文过多或过快导致接收方缓存区溢出。</p>
+<h4 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h4><p>接收方在其向发送方的 TCP 段头部的 rwnd 字段“通告”其空闲 buffer 大小</p>
+<ul>
+<li>RcvBuffer 大小通过 socket 选项设置 (典型默认大小为 4096 字节) </li>
+<li>很多操作系统自动调整 RcvBuffer</li>
+</ul>
+<p>送方限制未确认（“in-flight”）字节的个数 <strong>≤</strong> 接收方发送过来的 rwnd 值保证接收方不会被淹没</p>
+<p><strong>接收方缓存</strong></p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672047297496.png" alt="1672047297496"></p>
+<h3 id="TCP连接管理"><a href="#TCP连接管理" class="headerlink" title="TCP连接管理"></a>TCP连接管理</h3><p>TCP 在正式交换数据之前，发送方和接收方需要通过握手建立通信关系：双方都同意建立连接（每一方都知道对方愿意建立连接），初始化连接参数（序号，MSS等）。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672047455421.png" alt="1672047455421"></p>
+<h4 id="TCP建立连接"><a href="#TCP建立连接" class="headerlink" title="TCP建立连接"></a>TCP建立连接</h4><h5 id="TCP-只通过两次握手建立连接的弊端"><a href="#TCP-只通过两次握手建立连接的弊端" class="headerlink" title="TCP 只通过两次握手建立连接的弊端"></a>TCP 只通过两次握手建立连接的弊端</h5><p>在一个不可靠的网络中，总会有一些意外发生。包括但不限于——包传输延迟变化很大、存在重传的报文段 、存在报文重排序。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672047965551.png" alt="1672047965551"></p>
+<h5 id="三次握手解决半连接和接收老数据问题"><a href="#三次握手解决半连接和接收老数据问题" class="headerlink" title="三次握手解决半连接和接收老数据问题"></a>三次握手解决半连接和接收老数据问题</h5><p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672048040205.png" alt="1672048040205"></p>
+<h5 id="TCP关闭连接"><a href="#TCP关闭连接" class="headerlink" title="TCP关闭连接"></a>TCP关闭连接</h5><p>TCP通过四次挥手关闭连接</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672110283451.png" alt="1672110283451"></p>
+<p>客户端，服务器分别关闭它自己这一侧的连接（ 发送FIN bit &#x3D; 1的TCP段 ），一旦接到FIN，用ACK回应（接到FIN段，ACK可以和它自己发出的FIN段一起发送），可以处理同时的FIN交换</p>
+<h3 id="拥塞控制原理"><a href="#拥塞控制原理" class="headerlink" title="拥塞控制原理"></a>拥塞控制原理</h3><p>当太多的数据需要网络传输，超过了网络的处理能力时就会导致网络拥塞</p>
+<p><strong>拥塞的表现</strong></p>
+<ul>
+<li>分组丢失（路由器缓冲区溢出）</li>
+<li>分组经历比较长的延迟（在路由器的队列中排队）</li>
+</ul>
+<h4 id="拥塞的原因-x2F-代价"><a href="#拥塞的原因-x2F-代价" class="headerlink" title="拥塞的原因&#x2F;代价"></a>拥塞的原因&#x2F;代价</h4><h5 id="场景1"><a href="#场景1" class="headerlink" title="场景1"></a>场景1</h5><p>假设一个局域网内有两个发送端、两个接收端和一个路由器，且路由器具备无限大的缓冲，这意味着无需考虑重传的情况</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/%E6%8B%A5%E5%A1%9E%E5%9C%BA%E6%99%AF1.png"></p>
+<p>此时：</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672299153419.png" alt="1672299153419"></p>
+<p><strong>R表示输出链路带宽</strong></p>
+<h5 id="场景2"><a href="#场景2" class="headerlink" title="场景2"></a>场景2</h5><p>依旧假设一个局域网内有两个发送端、两个接收端和一个路由器，此时这个路由器的缓冲是有限的，这意味着当缓冲区被用完时，分组会被丢弃，因此发送端需要重发被丢弃的分组。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/%E9%98%BB%E5%A1%9E%E5%9C%BA%E6%99%AF2.png"></p>
+<p>在该场景下，最理想的状态是发送端有完美的信息，即发送端知道什么时候路由器的缓冲是可用的，且只在缓冲可用时发送，这样分组永远可以有效的到达，不会被丢弃，在这种状态下，接收方的接收数据量就是发送方的发送数据量。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672299729553.png" alt="1672299729553"></p>
+<p>还有一种理想状态是发送方可以掌握丢失信息，即分组可以丢失，但在分组丢失之后发送方可以知道分组被丢弃并重传。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672299802798.png" alt="1672299802798"></p>
+<p>考虑到现实中情况可能不如理想的完美，因此分组可能丢失，且由于缓冲区已满而被丢弃，发送端最终因为超时而重发第二个拷贝，两个分组都被传出。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672299775147.png" alt="1672299775147"></p>
+<p><strong>输出比输入少的原因</strong>：</p>
+<ol>
+<li>重传的丢失分组</li>
+<li>没有必要重传的重复分组</li>
+</ol>
+<p><strong>拥塞的代价</strong>：</p>
+<ul>
+<li><p>为了达到一个有效输出，网络需要做更多的工作</p>
+</li>
+<li><p>没有必要的重传，链路中包含了多个分组的拷贝</p>
+<p>那些没有丢失，但是经历时间长的分组降低了传输速率</p>
+</li>
+</ul>
+<h5 id="场景3"><a href="#场景3" class="headerlink" title="场景3"></a>场景3</h5><p>相比前两个场景，该场景下使用多重路径</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672300549273.png" alt="1672300549273"></p>
+<p>在该场景下，若一条线路的上游传输压力突然增大，会导致下游的分组也都被丢弃，从而导致整个网络的不可用</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672300844989.png" alt="1672300844989"></p>
+<h4 id="拥塞控制的方法"><a href="#拥塞控制的方法" class="headerlink" title="拥塞控制的方法"></a>拥塞控制的方法</h4><p>2种常用的拥塞控制方法</p>
+<ul>
+<li><p><strong>端到端拥塞控制</strong></p>
+<p>端到端拥塞控制没有来自网络的显式反馈，端系统需要根据延迟和丢失事件推断是否有拥塞。TCP采用端到端拥塞控制</p>
+</li>
+<li><p><strong>网络辅助的拥塞控制</strong></p>
+<p>网络辅助的拥塞控制通过路由器提供给端系统以反馈信息，使用单个bit位，显示有拥塞（SNA, DECbit, TCP&#x2F;IP ECN, ATM），可以显式提供发送端可以采用的速率</p>
+</li>
+</ul>
+<h5 id="ATM-ABR-拥塞控制"><a href="#ATM-ABR-拥塞控制" class="headerlink" title="ATM ABR 拥塞控制"></a>ATM ABR 拥塞控制</h5><h6 id="ABR：avaliable-bit-rate"><a href="#ABR：avaliable-bit-rate" class="headerlink" title="ABR：avaliable bit rate"></a>ABR：avaliable bit rate</h6><p>“弹性服务”，如果发送端的路径“轻载”，则发送端使用可用带宽，如果发送端方的路径拥塞，则发送端限制其发送的速度到一个最小的保障速率上</p>
+<h6 id="RM（资源管理）信元"><a href="#RM（资源管理）信元" class="headerlink" title="RM（资源管理）信元"></a>RM（资源管理）信元</h6><p>由发送端发送，在数据信元中间隔插入，RM信元中的比特被交换机设置（网络辅助）</p>
+<ul>
+<li><strong>NI bit：</strong>no increase in rete（轻微阻塞）速率不要增加了</li>
+<li><strong>CI bit：</strong>congestion indication 拥塞指示</li>
+</ul>
+<p>发送端发送的RM信元被接收端返回，接收端不做任何改变</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672301905232.png" alt="1672301905232"></p>
+<p>在RM信元中的2个字节ER（explicit rate）字段</p>
+<ul>
+<li>拥塞的交换机可能降低信元中的ER的值</li>
+<li>发送端发送速度因此是最低的可支持速率</li>
+</ul>
+<p>数据信元中的EFCI bit：被拥塞的交换机设置成1</p>
+<ul>
+<li>如果在管理信元RM前面的数据i新能源EFCI被设置成1，接收端在返回的RM信元中设置CI bit</li>
+</ul>
+<h3 id="TCP拥塞控制"><a href="#TCP拥塞控制" class="headerlink" title="TCP拥塞控制"></a>TCP拥塞控制</h3><p><strong>TCP采用端到端的拥塞控制机制</strong>，路由器不向主机反馈有关拥塞的信息，这样可以是路由器的负担较轻，也更符合网络核心简单的TCP&#x2F;IP架构原则（核心在边缘系统），端系统根据自身得到的信息，判断是否发送拥塞，从而采取动作</p>
+<p><strong>拥塞控制的几个问题</strong></p>
+<ol>
+<li><p>如何检测拥塞</p>
+<p>轻微拥塞、拥塞</p>
+</li>
+<li><p>控制策略</p>
+<p>在拥塞发生时如何动作以降低速率</p>
+<p>轻微拥塞如何降低、拥塞如何降低</p>
+<p>拥塞缓解时如何动作以快速增加速率</p>
+</li>
+</ol>
+<h4 id="拥塞感知"><a href="#拥塞感知" class="headerlink" title="拥塞感知"></a>拥塞感知</h4><p>发送端如何探测拥塞，分为拥塞和轻微拥塞两种情况</p>
+<h5 id="拥塞的情况"><a href="#拥塞的情况" class="headerlink" title="拥塞的情况"></a>拥塞的情况</h5><p>假设某个段超时了（丢失事件，超时时间到某个段的确认没有来），这可能有多种原因导致</p>
+<ol>
+<li>网络拥塞（某个路由器缓冲区没空间了，被丢弃） <strong>概率大</strong></li>
+<li>出错被丢弃（各级错误，没有通过校验，被丢弃） <strong>概率小</strong></li>
+</ol>
+<blockquote>
+<p>一旦超时就认为拥塞了，这虽然可能导致误判，但总体控制方向是对的</p>
+</blockquote>
+<h5 id="轻微拥塞的情况"><a href="#轻微拥塞的情况" class="headerlink" title="轻微拥塞的情况"></a>轻微拥塞的情况</h5><p>收到某个段的3次重复ACK判定为轻微拥塞，网络这时还能够进行一定程度的传输，虽然发生了拥塞但情况要比第一种好</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/htwu6w4u.png"></p>
+<h4 id="速率控制方法"><a href="#速率控制方法" class="headerlink" title="速率控制方法"></a>速率控制方法</h4><h5 id="如何控制发送端发送的速率"><a href="#如何控制发送端发送的速率" class="headerlink" title="如何控制发送端发送的速率"></a>如何控制发送端发送的速率</h5><ol>
+<li><p>维持一个拥塞窗口的值：<strong>CongWin</strong></p>
+</li>
+<li><p>发送端限制<strong>已发送但未确认</strong>的数据量（的上限）：</p>
+<p>&#x3D;&#x3D;LastByteSent - LaseByteAcked ≤ CongWin&#x3D;&#x3D;</p>
+</li>
+<li><p>从而粗略的控制发送方往网络中注入的速率</p>
+</li>
+</ol>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672308805912.png" alt="1672308805912"></p>
+<p>CongWin是动态的，是感知到的网络拥塞程度的函数。当分组超时或收到3个冗余ACK时，CongWin就会下降。</p>
+<ul>
+<li><strong>超时时：</strong>CongWin降为1MSS，进入SS阶段然后在倍增到CongWin&#x2F;2（每个RTT），从而进入CA阶段</li>
+<li><strong>3个冗余ACK：</strong>CongWin降为CongWin&#x2F;2，CA阶段</li>
+</ul>
+<p>否则（正常收到ACK，没有发生以上情况）：CongWin上升</p>
+<ul>
+<li><strong>SS阶段：</strong>指数型增加（每个RTT）</li>
+<li><strong>CA阶段：</strong>线性增加   （每个RTT）</li>
+</ul>
+<h5 id="TCP拥塞控制和流量控制的联合动作"><a href="#TCP拥塞控制和流量控制的联合动作" class="headerlink" title="TCP拥塞控制和流量控制的联合动作"></a>TCP拥塞控制和流量控制的联合动作</h5><p>发送端控制发送但是未确认的量，同时也不能够超过接收窗口，满足流量控制的要求</p>
+<ul>
+<li>SendWin &#x3D; min{CongWin, RecvWin}</li>
+<li>同时满足拥塞控制和流量控制的要求</li>
+</ul>
+<h4 id="拥塞控制策略"><a href="#拥塞控制策略" class="headerlink" title="拥塞控制策略"></a>拥塞控制策略</h4><ul>
+<li>慢启动</li>
+<li>AIMD：线性增、乘性减</li>
+<li>超时事件后的保守策略</li>
+</ul>
+<h5 id="TCP慢启动"><a href="#TCP慢启动" class="headerlink" title="TCP慢启动"></a>TCP慢启动</h5><p>在连接刚建立时，CongWin &#x3D; 1MSS，可用带宽&gt;MSS&#x2F;RTT，此时应该尽快加速以达到希望速率。</p>
+<p>当连接开始时，指数性增加发送速率，直到发生丢失的事件。此时每个RTT，CongWin会加倍增长，每收到一个ACK时CongWin加1，慢启动阶段只要不超时或收到3个冗余ACK，一个<strong>RTT</strong>内CongWin加倍</p>
+<p><strong>总结：初始速率很慢，但是加速却是指数性的</strong>（指数增加，SS时间很短，长期来看可以忽略）</p>
+<h5 id="AIMD"><a href="#AIMD" class="headerlink" title="AIMD"></a>AIMD</h5><h6 id="乘性减"><a href="#乘性减" class="headerlink" title="乘性减"></a>乘性减</h6><p>丢失事件后将CongWin降为1，并将CongWin&#x2F;2作为阈值，进入慢启动阶段（倍增直到CongWin&#x2F;2）</p>
+<h6 id="加性增"><a href="#加性增" class="headerlink" title="加性增"></a>加性增</h6><p>当CongWin <strong>&gt;</strong> 阈值时，一个 RTT 内如没有发生丢失事件，将CongWin加1MSS：探测</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672319234681.png" alt="1672319234681"></p>
+<p>当收到3个重复的ACK时，CongWin减半，窗口（缓冲区大小）之后线性增长，当超时事件发生时，CongWin被设置成1MSS，进入SS阶段，之后窗口指数增长，增长到一个阈值（上次发生拥塞的窗口的一半）时，再线性增加。具体就是使用一个变量——<strong>Threshold</strong>，当出现丢失时，Threshold设置成 CongWin的1&#x2F;2。</p>
+<p>（3个重复ACK表示网络还有一定的段传输能力，超时之前的3个重复ACK相当于网络阻塞的“警报”）</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672319489418.png" alt="1672319489418"></p>
+<h4 id="拥塞控制总结"><a href="#拥塞控制总结" class="headerlink" title="拥塞控制总结"></a>拥塞控制总结</h4><ul>
+<li><p>当CongWin <strong>&lt;</strong> Threshold， 发送端处于慢启动阶段（ slow-start），窗口指数性增长</p>
+</li>
+<li><p>当CongWin <strong>&gt;</strong> Threshold, 发送端处于拥塞避免阶段（congestion-avoidance），窗口线性增长</p>
+</li>
+<li><p>当收到三个重复的ACKs (triple duplicate ACK)，Threshold设置成 CongWin &#x2F; 2， CongWin &#x3D; Threshold + 3</p>
+</li>
+<li><p>当超时事件发生时timeout，Threshold &#x3D; CongWin &#x2F; 2 </p>
+<p>CongWin &#x3D; 1 MSS，进入SS阶段</p>
+</li>
+</ul>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672319711980.png" alt="1672319711980"></p>
+<p><strong>拥塞控制状态机</strong></p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672319869507.png" alt="1672319869507"></p>
+<h4 id="TCP吞吐量"><a href="#TCP吞吐量" class="headerlink" title="TCP吞吐量"></a>TCP吞吐量</h4><p>使用窗口window尺寸W和RTT来描述，忽略慢启动阶段，假设发送端总有数据传输 ，用W表示发生丢失事件时的窗口尺寸（单位：字节） </p>
+<ul>
+<li>平均窗口尺寸（#in-flight字节）：3&#x2F;4W</li>
+<li>平均吞吐量：RTT时间吞吐3&#x2F;4W</li>
+</ul>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672320012048.png" alt="1672320012048"></p>
+<h4 id="TCP公平性"><a href="#TCP公平性" class="headerlink" title="TCP公平性"></a>TCP公平性</h4><p>公平性目标: 如果K个TCP会话分享一个链路带宽为R的瓶颈，每一个会话的有效带宽为R&#x2F;K</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672320315263.png" alt="1672320315263"></p>
+<h5 id="公平性和UDP"><a href="#公平性和UDP" class="headerlink" title="公平性和UDP"></a>公平性和UDP</h5><p>多媒体应用通常不是使用TCP，应用希望发送的数据希望不受拥塞控制的节制。因此使用UDP时音视频应用泵出数据的速率是恒定的, 忽略数据的丢失</p>
+<h5 id="公平性和并行TCP连接"><a href="#公平性和并行TCP连接" class="headerlink" title="公平性和并行TCP连接"></a>公平性和并行TCP连接</h5><p>2个主机间可以打开多个并行的TCP连接，例如web浏览器。例如: 带宽为R的链路支持了 9个连接，如果新的应用要求建1个TCP连接，获得带宽R&#x2F;10，如果新的应用要求建11个TCP 连接,获得带宽R&#x2F;2，因此TCP仅仅只是保证了相对公平性</p>
+<h4 id="网络辅助拥塞控制"><a href="#网络辅助拥塞控制" class="headerlink" title="网络辅助拥塞控制"></a>网络辅助拥塞控制</h4><p> TOS字段中2个bit被网络路由器标记，用于指示是否发生拥塞，拥塞指示被传送到接收主机，在接收方-到发送方的ACK中，接收方(在IP数据报中看到了拥塞指示）设置ECE bit，指示发送方发生了拥塞</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1672320747270.png" alt="1672320747270"></p>
+<h2 id="TCP-可靠数据传输-rdt-原理"><a href="#TCP-可靠数据传输-rdt-原理" class="headerlink" title="TCP - 可靠数据传输(rdt)原理"></a>TCP - 可靠数据传输(rdt)原理</h2><p>可靠数据传输是指：数据可以通过一条可靠信道来传输。传输的数据不会受到损失或者丢失，而且所有数据都是按照其发送顺序进行交付。</p>
+<p>我们都知道 IP 层是不可靠传输的，而 TCP 是可靠传输的，但是 TCP 是传输层的协议，这就要求设计一个合理的协议机制，当底层丢失的时候，需要如何处理。下面一步步构造可靠数据传输协议。称之为 rdt 协议。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1690986879835.png" alt="1690986879835"></p>
+<h3 id="构造可靠数据传输"><a href="#构造可靠数据传输" class="headerlink" title="构造可靠数据传输"></a>构造可靠数据传输</h3><p>考虑到底层信道模型越来越复杂，在本节中我们将不断地开发一个可靠数据传输协议的发送方一侧和接收方一侧。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157324924.png" alt="1691157324924"></p>
+<h4 id="rdt1-0"><a href="#rdt1-0" class="headerlink" title="rdt1.0"></a>rdt1.0</h4><p>在rdt1.0中，假设下层的信道是完全可靠的，即：没有比特出错，没有分组丢失。</p>
+<p>在这种情况下，发送方可以直接将数据发送到下层信道，接收方也可以直接从下层信道接收数据，无需做任何可靠性方面的工作</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157392836.png" alt="1691157392836"></p>
+<h4 id="rdt2-0"><a href="#rdt2-0" class="headerlink" title="rdt2.0"></a>rdt2.0</h4><p>在 rdt2.0 中，假设下层信道可能会出错（不会丢失）。按照通信原理的内容具体来看，就是指在传输过程中的误码或者是误信率。 </p>
+<p>为了解决差错重传的问题，rdt2.0采用了ACK&#x2F;NAK 机制，利用<strong>差错控制编码</strong>进行差错检测</p>
+<ul>
+<li><p>发送方差错控制编码、缓存</p>
+</li>
+<li><p>接收方使用编码检错</p>
+</li>
+<li><p>接收方反馈：</p>
+<p>ACK：接收方显示地告诉发送方分组已被正确接收</p>
+<p>NAK：接收方显示地告诉发送方分组发生了差错</p>
+</li>
+<li><p>发送方根据接收方反馈做出响应</p>
+<p>ACK：发送方发送下一分组</p>
+<p>NAK：发送方重发出错的分组</p>
+</li>
+</ul>
+<blockquote>
+<p>差错检测可以使用检验和，接收方反馈的情况无非就是“肯定确认”（ACK）和“否定确认”（NAK）。当发送方接收到接收方反馈回来的NAK消息时，发送方重传该分组。</p>
+</blockquote>
+<h5 id="发送方状态"><a href="#发送方状态" class="headerlink" title="发送方状态"></a>发送方状态</h5><p> 发送方有两个状态，分别是等待上层传下来的数据以及等待接收方反馈回来的消息。当上层传输下来数据后，就调用rdt_send()发送数据。然后进入等待接收方反馈消息的状态。如果反馈的是ACK，那么说明数据无误，进入等待上层数据状态；如果反馈消息是NAK，那么重发分组，并且继续等待接收方的反馈消息，直到等到ACK消息，才进入等待上层数据状态。需要注意，在这种情形下，不能在等待ACK和NAK的时候从上层获取数据。称之为“<strong>停等</strong>”协议。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157597799.png" alt="1691157597799"></p>
+<h5 id="接收方状态"><a href="#接收方状态" class="headerlink" title="接收方状态"></a>接收方状态</h5><p>接收方在 rdt2.0 中仍旧只有一个状态，当数据到达之后，计算校验和，然后反馈给发送方 ACK 或者 NAK。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157649344.png" alt="1691157649344"></p>
+<h5 id="rdt2-1-ACK-x2F-NAK出错的处理"><a href="#rdt2-1-ACK-x2F-NAK出错的处理" class="headerlink" title="rdt2.1 - ACK&#x2F;NAK出错的处理"></a>rdt2.1 - ACK&#x2F;NAK出错的处理</h5><p><strong>rdt2.0 协议的致命缺陷是没有考虑到用于 NAK&#x2F;ACK 的分组可能会受损。</strong></p>
+<p>解决这个问题的一个简单办法给分组中添加一个新字段：编号。即把发送数据分组的序号放在该字段。这样，接收方只需要检测序号就能发现是否重传了分组。 rdt2.0 是“停等”的，因此，只需要一位序号就够了。因为只有接收方和发送方都确认该分组传输完成了，才会传输下一个分组。只要前后两次分组的编号是不同的即可，不需要管分组编号是否重复。</p>
+<h6 id="发送方处理出错的ACK-x2F-NAK"><a href="#发送方处理出错的ACK-x2F-NAK" class="headerlink" title="发送方处理出错的ACK&#x2F;NAK"></a>发送方处理出错的ACK&#x2F;NAK</h6><p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157712356.png" alt="1691157712356"></p>
+<p>发送方在分组中加入 0 或 1 的序列号，一次只发送一个未经确认的分组，当发送方收到接收方的 NAK 或受损的回复时，重发上次发送的分组，只有收到 ACK 时才发送下一分组，这样做的缺点就是发送方必须检测 ACK&#x2F;NAK 是否出错（需要EDC），此外状态数变成了两倍（必须记住当前分组的序列号为 0 还是 1）</p>
+<h6 id="接收方处理出错的ACK-x2F-NAK"><a href="#接收方处理出错的ACK-x2F-NAK" class="headerlink" title="接收方处理出错的ACK&#x2F;NAK"></a>接收方处理出错的ACK&#x2F;NAK</h6><p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691157777815.png" alt="1691157777815"></p>
+<p>接收方在接收到分组后必须检测接收到的分组是否是重复的，此外由于没有安排“确认的确认”，因此接收方并不知道发送方是否正确收到了其 ACK&#x2F;NAK：</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691158177419.png" alt="1691158177419"></p>
+<h5 id="rdt2-2-无NAK的协议"><a href="#rdt2-2-无NAK的协议" class="headerlink" title="rdt2.2 - 无NAK的协议"></a>rdt2.2 - 无NAK的协议</h5><p>在 rdt2.2 中接收方对<strong>最后</strong>正确接收的分组发 ACK（冗余 ACK），替代 NAK。【接收方必须显式地包含被正确接收分组的序号】</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1701870445347.png" alt="1701870445347"></p>
+<p>当发送方收到重复序号的 ACK（例如发送的是 1 号分组，接收到的是 0 号 ACK）时表示错误（相当于 NAK），发送方将会重发上次发送的分组。这样做的好处是一次能够发送多个分组，且之前的处理中每一个的应答都有 ACK&#x2F;NACK 这样比较麻烦，而使用对前一个数据单位的 ACK，代替本数据单位的 NAK，确认信息减少一半，协议简单。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1691158372332.png" alt="1691158372332"></p>
+<h4 id="rdt3-0"><a href="#rdt3-0" class="headerlink" title="rdt3.0"></a>rdt3.0</h4><p>在 rdt3.0 中，假设下层信道可能会出现差错也可能丢失分组，此时在 rdt3.0 中存在的新问题就是如何解决丢失的数据的重传问题。</p>
+<p>如果继续使用 rdt2.0 中的确认机制，如果 ACK&#x2F;NAK 的信息报文丢失，可能会导致死锁（接收方未收到 ACK&#x2F;NAK 信息因此不会继续发送分组）。为了解决这个问题在 rdt3.0 中引入了超时重发机制 —— 当发送方发送一个分组时，启动一个<strong>超时定时器</strong>，在大于分组往返的一个特定时间内，如果没有接收到接收方的 ACK&#x2F;NAK 响应，则将刚刚发送的分组再重发一遍。重发将会导致数据重复，但在 rdt2.0 中利用序列号以及解决了这个问题。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671718195487.png" alt="1671718195487"></p>
+<h5 id="rdt3-0性能"><a href="#rdt3-0性能" class="headerlink" title="rdt3.0性能"></a>rdt3.0性能</h5><p>rdt3.0虽然有效解决了分组或确认信息出错丢失的问题，但是在链路容量比较大的情况下，rdt3.0的性能很差。</p>
+<p>由于链路容量很大，一次只能发送一个PDU不能够充分利用链路的传输能力。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671718418540.png" alt="1671718418540"></p>
+<p>由此可见rdt3.0性能问题的核心在于它是一个停等协议。即在发送完一个分组后需要等待接收方的ACK，在收到ACK后才发送下一个分组，从上面的例子中可以看出，发送方在30.008ms内只能发送1000字节，有效的吞吐量仅为267kbps，即使有1Gbps的链路可用时也是如此。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671718487875.png" alt="1671718487875"></p>
+<h4 id="流水线协议"><a href="#流水线协议" class="headerlink" title="流水线协议"></a>流水线协议</h4><p>解决rdt3.0性能问题的一个简单办法就是不以停等方式运行，允许发送方发送多个分组而无需等待。</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671718605597.png" alt="1671718605597"></p>
+<p>由于需要一次发送多个分组，因此必须增加序号的范围，由原来的一个 bit 改为用多个 bit 表示分组，并且在发送方&#x2F;接收方之间要有缓冲区，发送方缓存在未得到确认时重传缓冲区中的分组，接收方缓存负责将上层可能乱序的数据重新排序。</p>
+<p>此外，所需序号的范围和对缓冲的要求取决于数据传输协议如何处理丢失、损坏及延时过大的分组，目前解决流水线的差错恢复方法有两种：<strong>GBN【回退N步】</strong>和<strong>SR【选择重传】</strong></p>
+<h5 id="通用：滑动窗口（slide-window）协议"><a href="#通用：滑动窗口（slide-window）协议" class="headerlink" title="通用：滑动窗口（slide window）协议"></a>通用：滑动窗口（slide window）协议</h5><h6 id="发送缓冲区"><a href="#发送缓冲区" class="headerlink" title="发送缓冲区"></a>发送缓冲区</h6><p>滑动窗口协议通过在内存中建立一个发送缓冲区，用于存放已发送但是没有得到确认的分组，以便需要重发时能直接从缓冲区重发，此外落入缓冲区的分组也可以随时发送。</p>
+<p><strong>发送缓冲区大小</strong></p>
+<p>发送缓冲区的大小决定了一次最多可以发送多少个未经确认的分组，在停止等待协议中（rdt3.0），发送缓冲区的大小为1，流水线协议中发送缓冲区的大小大于1，具体数值需要根据链路大小来确定（链路利用率不能超过100%）</p>
+<p><strong>发送缓冲区中的分组</strong></p>
+<p>未发送的分组落入发送缓冲区可以连续发送出去，已发送出去的分组需要等待接收方确认（ACK），只有得到确认才能被删除</p>
+<h6 id="发送窗口"><a href="#发送窗口" class="headerlink" title="发送窗口"></a>发送窗口</h6><p>发送窗口是指那些已经发送但是未经确认分组的序号构成的空间，它是发送缓冲区的一个子集</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671722856344.png" alt="1671722856344"></p>
+<p><strong>如上图：绿色部分为发送缓冲区，红色部分为发送窗口。发送窗口大小不能超过发送缓冲区大小</strong></p>
+<h6 id="发送窗口前沿-x2F-后沿"><a href="#发送窗口前沿-x2F-后沿" class="headerlink" title="发送窗口前沿&#x2F;后沿"></a>发送窗口前沿&#x2F;后沿</h6><p>发送窗口使用一个前沿一个后沿表示窗口的大小（类似队列中的头尾指针），发送方每发送一个分组，发送窗口前沿移动一个单位。接收方确认一个老分组时，发送窗口后沿移动一个单位。没有发送任何分组时，前沿 &#x3D; 后沿，发送窗口尺寸为0</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671723339535.png" alt="1671723339535"></p>
+<h6 id="接收窗口"><a href="#接收窗口" class="headerlink" title="接收窗口"></a>接收窗口</h6><p>接收窗口（receiving window）也叫接收缓冲区，它用于控制哪些分组可以被接收，只有收到的分组序号落入接收窗口内，才允许接收，若序号在接收窗口之外则丢弃，接收窗口尺寸Wr &#x3D; 1，只能顺序接收；接收窗口尺寸Wr &gt; 1，可以乱序接收，但是提交给上层的分组要按序。</p>
+<h6 id="接收窗口的滑动和发送确认"><a href="#接收窗口的滑动和发送确认" class="headerlink" title="接收窗口的滑动和发送确认"></a>接收窗口的滑动和发送确认</h6><p><strong>滑动</strong></p>
+<ul>
+<li>低序号的分组到来，接收窗口移动</li>
+<li>高序号分组乱序到，缓存但不交付（因为要实现rdt，不允许失序），不滑动</li>
+</ul>
+<p><strong>发送确认</strong></p>
+<ul>
+<li>接收窗口尺寸&#x3D;1：发送连续收到的最大的分组确认（累计确认） </li>
+<li>接收窗口尺寸&gt;1：收到分组，发送那个分组的确认（非累计确认）</li>
+</ul>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671723809389.png" alt="1671723809389"></p>
+<h5 id="GBN-回退N步协议"><a href="#GBN-回退N步协议" class="headerlink" title="GBN - 回退N步协议"></a>GBN - 回退N步协议</h5><h6 id="特点"><a href="#特点" class="headerlink" title="特点"></a>特点</h6><p>在滑动窗口协议的基础上，发送窗口尺寸 <strong>&gt; 1</strong>，接收窗口尺寸 <strong>&#x3D; 1</strong></p>
+<p>在GBN协议中，发送方首先检查窗口大小是否是满的，如果没有满，那么就产生一个分组并将其发送，并且同时更新变量。如果窗口已经满了，那么发送方给上层指出已满。然后上层会等一会再来试。发送方收到ACK应答的方式是“<strong>累计确认</strong>”。这表明接收方已经正确接受到序列为N的以前的所有分组。当超时事件发生的时候，GBN协议是“回退N步”来进行处理的。它将已经确认收到之后所有已发送但未确认的分组重传。这样能够保证分组的顺序。</p>
+<p>接收方需要做的事情比较简单，如果序号为n的分组被正确接收，并且它之前的所有分组也是正确接收到了，那么就返回一个ACK，否则丢弃该分组，并且按照最近接收的分组，重新发送该分组的ACK。</p>
+<h6 id="缺点"><a href="#缺点" class="headerlink" title="缺点"></a>缺点</h6><p>GBN的缺点很明显就是重传的时候，需要传输大量的分组，这个问题在网络环境比较糟糕的情形下，会导致非常多的重传出现。 </p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671724377491.png" alt="1671724377491"></p>
+<h5 id="SR-选择重发协议"><a href="#SR-选择重发协议" class="headerlink" title="SR - 选择重发协议"></a>SR - 选择重发协议</h5><h6 id="特点-1"><a href="#特点-1" class="headerlink" title="特点"></a>特点</h6><p>在滑动窗口协议的基础上，发送窗口尺寸 <strong>&gt; 1</strong>，接收窗口尺寸 <strong>&gt; 1</strong></p>
+<h6 id="接收方"><a href="#接收方" class="headerlink" title="接收方"></a>接收方</h6><p>在SR协议中， 接收方对每个正确接收的分组，分别发送 ACK(n)（<strong>非累计确认</strong>），由于接收窗口&gt;1，使得它可以缓存乱序的分组，最终需要将分组按顺序的交付给上层</p>
+<h6 id="发送方"><a href="#发送方" class="headerlink" title="发送方"></a>发送方</h6><p>发送方需要为每个未确认的分组设定一个定时器，只对那些没有超时收到ACK的分组进行重发（选择性重发），发送窗口的最大值（发送缓冲区）限制发送未确认分组的个数</p>
+<p><img src="/2023/08/20/%E4%BC%A0%E8%BE%93%E5%B1%82/1671934881612.png" alt="1671934881612"></p>
+<h5 id="对比GBN和SR"><a href="#对比GBN和SR" class="headerlink" title="对比GBN和SR"></a>对比GBN和SR</h5><h6 id="GBN"><a href="#GBN" class="headerlink" title="GBN"></a>GBN</h6><ul>
+<li><strong>优点：</strong>简单，所需资源少（接收方只需要一个缓存单元）</li>
+<li><strong>缺点：</strong>一旦出错，回退N步代价较大</li>
+</ul>
+<h6 id="SR"><a href="#SR" class="headerlink" title="SR"></a>SR</h6><ul>
+<li><strong>优点：</strong>出错时，重传一个代价小</li>
+<li><strong>缺点：</strong>复杂，所需要的资源多（接收方多个缓存单元）</li>
+</ul>
+<h6 id="适用范围"><a href="#适用范围" class="headerlink" title="适用范围"></a>适用范围</h6><p>在分组出错率比较低时比较适合使用 GBN，出错非常罕见的情况下，没有必要用复杂的 SR 为罕见的事件做日常的准备和复杂的处理。</p>
+<p>当链路容量大（延迟大、带宽大）时，比较适合 SR 而不是 GBN，一点出错代价太大</p>
+
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+        <div class="post-eof"></div>
+      </footer>
+  </article>
+  
+  
+  
+
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
     <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/07/30/%E5%BA%94%E7%94%A8%E5%B1%82/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -1601,7 +2117,7 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">5</span>
+          <span class="site-state-item-count">6</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
@@ -1641,7 +2157,7 @@
 <div class="copyright">
   
   &copy; 
-  <span itemprop="copyrightYear">2023</span>
+  <span itemprop="copyrightYear">2024</span>
   <span class="with-love">
     <i class="fa fa-heart"></i>
   </span>
