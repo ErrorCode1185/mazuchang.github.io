@@ -20,20 +20,73 @@
     var CONFIG = {"hostname":"mazuchang.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":320,"display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
   </script>
 
-  <meta name="description" content="网络层 - 数据平面网络层服务网络层服务主要负责在发送主机与接收主机之间传送段（segment），具体形式是在发送端将段封装到数据报中，在接收端将段上交给传输层实体。网络层协议存在于每一个主机和路由器上，路由器会检查每一个经过它的IP数据报的头部并转发数据包。 ![1672641959497](网络层 - 数据平面&#x2F;1672641959497.png) 网络层关键功能转发将分组从路由器的">
+  <meta name="description" content="网络层 - 数据平面网络层服务网络层服务主要负责在发送主机与接收主机之间传送段（segment），具体形式是在发送端将段封装到数据报中，在接收端将段上交给传输层实体。网络层协议存在于每一个主机和路由器上，路由器会检查每一个经过它的IP数据报的头部并转发数据包。  网络层关键功能转发将分组从路由器的输入接口转发到合适的输出接口【局部的功能】【转发决定了一个具体的数据交换节点从哪个端口入，通过哪个合适">
 <meta property="og:type" content="article">
 <meta property="og:title" content="网络层 - 数据平面">
-<meta property="og:url" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%20-%20%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/index.html">
+<meta property="og:url" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/index.html">
 <meta property="og:site_name" content="mazuchang">
-<meta property="og:description" content="网络层 - 数据平面网络层服务网络层服务主要负责在发送主机与接收主机之间传送段（segment），具体形式是在发送端将段封装到数据报中，在接收端将段上交给传输层实体。网络层协议存在于每一个主机和路由器上，路由器会检查每一个经过它的IP数据报的头部并转发数据包。 ![1672641959497](网络层 - 数据平面&#x2F;1672641959497.png) 网络层关键功能转发将分组从路由器的">
+<meta property="og:description" content="网络层 - 数据平面网络层服务网络层服务主要负责在发送主机与接收主机之间传送段（segment），具体形式是在发送端将段封装到数据报中，在接收端将段上交给传输层实体。网络层协议存在于每一个主机和路由器上，路由器会检查每一个经过它的IP数据报的头部并转发数据包。  网络层关键功能转发将分组从路由器的输入接口转发到合适的输出接口【局部的功能】【转发决定了一个具体的数据交换节点从哪个端口入，通过哪个合适">
 <meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672641959497.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672472290886.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672472399552.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672833168742.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672473320459.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1707986970161.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1708052082136.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672473793084.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672473893265.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/9fb86f3e6cab4a9a837dafe9786fdf67.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672474501252.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672474880299.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672475267384.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672475396379.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550552130.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550674894.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550779021.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550876269.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550934694.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/323eb8fabc9e437f9866f83d12a7b853.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/c85ee960de49456f9bc71a2e8eca1a71.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/34f79aeccecc8a8d4778838ecd55278b.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/9c6f7290ee0a51ff589205eba5242aaa.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/93a5a3bde247573aa72cf73226d7f8b2.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/3c4accfa49e3e6b6b0324e58a9abc638.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/f7727d7e80ffcc506bc25034cdde2226.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/64c23f4d662576f1d3352a398558988d.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/2c6c5341518abdc87ef881a14253ed8c.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672642245915.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672643000577.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672643398913.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/%E8%B7%AF%E7%94%B1%E8%81%9A%E5%90%88.jpg">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672665034483.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672665221376.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(1).png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(2).png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(3).png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(4).png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667124873.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667195297.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667171436.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672668173422.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667402023.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667460530.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672833168742.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835501755.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835573794.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835925091.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835980854.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672836416872.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672836601682.png">
 <meta property="article:published_time" content="2023-08-29T16:00:00.000Z">
-<meta property="article:modified_time" content="2024-02-17T02:16:10.139Z">
+<meta property="article:modified_time" content="2024-02-17T02:23:29.542Z">
 <meta property="article:author" content="mazuchang">
 <meta property="article:tag" content="计算机网络">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672641959497.png">
 
-<link rel="canonical" href="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%20-%20%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/">
+<link rel="canonical" href="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/">
 
 
 <script id="page-configurations">
@@ -162,7 +215,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%20-%20%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/">
+    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -192,7 +245,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2024-02-17 10:16:10" itemprop="dateModified" datetime="2024-02-17T10:16:10+08:00">2024-02-17</time>
+                <time title="修改时间：2024-02-17 10:23:29" itemprop="dateModified" datetime="2024-02-17T10:23:29+08:00">2024-02-17</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -216,7 +269,7 @@
 
       
         <h1 id="网络层-数据平面"><a href="#网络层-数据平面" class="headerlink" title="网络层 - 数据平面"></a>网络层 - 数据平面</h1><h2 id="网络层服务"><a href="#网络层服务" class="headerlink" title="网络层服务"></a>网络层服务</h2><p>网络层服务主要负责在发送主机与接收主机之间传送段（segment），具体形式是在发送端将段封装到数据报中，在接收端将段上交给传输层实体。网络层协议存在于每一个主机和路由器上，路由器会检查每一个经过它的IP数据报的头部并转发数据包。</p>
-<p>![1672641959497](网络层 - 数据平面&#x2F;1672641959497.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672641959497.png" alt="1672641959497"></p>
 <h3 id="网络层关键功能"><a href="#网络层关键功能" class="headerlink" title="网络层关键功能"></a>网络层关键功能</h3><h4 id="转发"><a href="#转发" class="headerlink" title="转发"></a>转发</h4><p>将分组从路由器的输入接口转发到合适的输出接口【局部的功能】【转发决定了一个具体的数据交换节点从哪个端口入，通过哪个合适的端口把它放出去】<strong>【数据平面的部分】</strong> </p>
 <h4 id="路由"><a href="#路由" class="headerlink" title="路由"></a>路由</h4><p>使用路由算法来决定分组从发送主机到目标接收主机的路径【全局的功能】【路由决定了路径】<strong>【控制平面的部分】</strong></p>
 <ul>
@@ -236,15 +289,15 @@
 <h3 id="数据平面-x2F-控制平面实现方式"><a href="#数据平面-x2F-控制平面实现方式" class="headerlink" title="数据平面&#x2F;控制平面实现方式"></a>数据平面&#x2F;控制平面实现方式</h3><h4 id="传统方式：每一路由器（Per-router）控制平面"><a href="#传统方式：每一路由器（Per-router）控制平面" class="headerlink" title="传统方式：每一路由器（Per-router）控制平面"></a>传统方式：每一路由器（Per-router）控制平面</h4><p>在传统方式下，每个路由器既实现了控制平面的功能，又实现了数据平面的功能，路由器上面都有一个路由选择组件，用于与其他路由器中的路由选择组件同行，以计算其转发表的值。</p>
 <p>传统方式下IP路由器把控制平面和数据平面在一个设备上一起实现，每个路由器独立的实现控制平面和数据平面的功能，所以控制平面和数据平面都是分布式的去做，到来的每个分组，按照控制平面算出来的路由表，IP协议对到来的分组做转发，转发的依据就是IP分组当中的目标IP地址 </p>
 <p>在传统方式下控制平面和数据平面高度耦合，并且计算路由表是分布式的完成，带来的问题是，要改路由器的运行逻辑非常困难</p>
-<p>![1672472290886](网络层 - 数据平面&#x2F;1672472290886.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672472290886.png" alt="1672472290886"></p>
 <h5 id="传统方式下路由和转发的相互作用"><a href="#传统方式下路由和转发的相互作用" class="headerlink" title="传统方式下路由和转发的相互作用"></a>传统方式下路由和转发的相互作用</h5><p>路由表是控制平面和数据平面的粘合剂，控制平面算出来路由表，IP协议根据路由表对到来的分组做匹配，然后进行转发，根据IP数据报目标IP地址进行转发</p>
-<p>![1672472399552](网络层 - 数据平面&#x2F;1672472399552.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672472399552.png" alt="1672472399552"></p>
 <h4 id="SDN方式：逻辑集中的控制平面【软件定义网络】"><a href="#SDN方式：逻辑集中的控制平面【软件定义网络】" class="headerlink" title="SDN方式：逻辑集中的控制平面【软件定义网络】"></a>SDN方式：逻辑集中的控制平面【软件定义网络】</h4><p>在SDN方式下控制平面的功能是集中在一个服务器上去做的，这个服务器也叫远程控制器、网络操作系统，网络操作系统实现了控制平面的功能，通过<strong>南向接口</strong>跟每一个分组交换设备的<strong>CA（控制代理）</strong>打交道，然后控制代理上报他们的状况，<strong>控制器把流表算出来</strong>，通过南向接口交给每一个分组交换设备，<strong>分组交换设备把流表进行装载</strong>，对到来的分组做多字段的匹配，匹配完了之后按照匹配完流表的表项所对应的动作，对分组做动作</p>
 <p>因此实现网络设备的行为逻辑只需要改变流表就可以了，控制器上的网络应用可以按照不同方式来算出流表，分组交换设备按照流表对到来的分组做相应的处理。这样的话，网络设备要改变它的行为逻辑仅仅改变控制器，在控制器上实现不同的网络应用就行了。IP分组的传统方式仅仅相当于它的特例。 </p>
 <blockquote>
 <p>在SDN中控制平面是集中式的，网络可编程，SDN由一个不同的（通常是远程的）控制器与本地控制代理（CAs）交互</p>
 </blockquote>
-<p>![1672833168742](网络层 - 数据平面&#x2F;1672833168742.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672833168742.png" alt="1672833168742"></p>
 <h5 id="SDN的主要思路"><a href="#SDN的主要思路" class="headerlink" title="SDN的主要思路"></a>SDN的主要思路</h5><p>SDN的主要思路就是将网络设备数据平面和控制平面分离，把原来的数据平面（路由器、交换机等）<strong>抽象</strong>成按照流表（由控制平面设置的控制逻辑）进行PDU（帧、分组）的动作（包括转发、丢弃、拷贝、泛洪、阻 塞），<strong>统一化</strong>设备功能让SDN交换机（分组交换机），执行控制逻辑。并将控制平面（网络应用）分离、集中起来，负责计算和下发控制逻辑（流表）</p>
 <p><strong>SDN的主要思路就是将原来分布式的控制平面功能做集中式的处理</strong></p>
 <h3 id="网络服务模型"><a href="#网络服务模型" class="headerlink" title="网络服务模型"></a>网络服务模型</h3><h4 id="概念"><a href="#概念" class="headerlink" title="概念"></a>概念</h4><p>对于单个数据报的服务来说网络为从发送方主机到接收方主机传输数据报的“通道” 提供可靠传送、延迟保证的服务模型</p>
@@ -263,8 +316,8 @@
 <p>在2个进程之间，很可能只体现在端系统上（TCP连接）【传输层的连接仅仅体现在端系统之上，所以说他叫面向连接，而网络层主机和主机之间的连接称之为有连接】</p>
 </li>
 </ul>
-<h4 id="网络服务模型-1"><a href="#网络服务模型-1" class="headerlink" title="网络服务模型"></a>网络服务模型</h4><p>![1672473320459](网络层 - 数据平面&#x2F;1672473320459.png)</p>
-<h2 id="路由器工作原理"><a href="#路由器工作原理" class="headerlink" title="路由器工作原理"></a>路由器工作原理</h2><h3 id="路由器结构概况"><a href="#路由器结构概况" class="headerlink" title="路由器结构概况"></a>路由器结构概况</h3><p>![1707986970161](网络层 - 数据平面&#x2F;1707986970161.png)</p>
+<h4 id="网络服务模型-1"><a href="#网络服务模型-1" class="headerlink" title="网络服务模型"></a>网络服务模型</h4><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672473320459.png" alt="1672473320459"></p>
+<h2 id="路由器工作原理"><a href="#路由器工作原理" class="headerlink" title="路由器工作原理"></a>路由器工作原理</h2><h3 id="路由器结构概况"><a href="#路由器结构概况" class="headerlink" title="路由器结构概况"></a>路由器结构概况</h3><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1707986970161.png" alt="1707986970161"></p>
 <center>高层面（非常简化的）通用路由器体系架构</center>
 
 <ul>
@@ -278,7 +331,7 @@
 <li><strong>输出端口：</strong>输出端口存储从交换结构接收的分组，并通过执行必要的链路层和物理层功能在输出链路上传输这些分组。当一条链路是双向的时（即承载两个方向的流量），输出端口通常与该链路的输入端口成对出现在同一线路卡上。</li>
 <li><strong>路由选择处理器：</strong>路由选择处理器执行控制平面的功能。在传统的路由器中，它执行路由选择协议，维护路由选择表与关联链路状态信息，并为该路由器计算转发表。在SDN路由器中，路由选择处理器（在其他活动中）负责与远程控制器同行，目的是接收由远程控制器计算的转发表象，并在该路由器的输入端口安装这些表象，路由器选择处理器还执行网络管理功能。</li>
 </ul>
-<h4 id="输入端口功能"><a href="#输入端口功能" class="headerlink" title="输入端口功能"></a>输入端口功能</h4><p>![1672473994522](网络层 - 数据平面&#x2F;1708052082136.png)</p>
+<h4 id="输入端口功能"><a href="#输入端口功能" class="headerlink" title="输入端口功能"></a>输入端口功能</h4><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1708052082136.png" alt="1672473994522"></p>
 <ul>
 <li><p><strong>线路端接：</strong>物理层的 line termination（链路终端）完成链路上的物理信号转化成数字信号的功能，转完之后交给数据链路层</p>
 </li>
@@ -295,10 +348,10 @@
 </li>
 </ul>
 <h5 id="基于目标的转发"><a href="#基于目标的转发" class="headerlink" title="基于目标的转发"></a>基于目标的转发</h5><p>路由器根据转发表中的地址划分，与数据包的前缀进行匹配，以此来确定通过哪条链路进行转发</p>
-<p>![1672473793084](网络层 - 数据平面&#x2F;1672473793084.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672473793084.png" alt="1672473793084"></p>
 <p>如果地址范围没有划分的特别规整可能会影响用户上网效率，不利于局域网网络的稳定运行。</p>
 <h6 id="最长前缀匹配"><a href="#最长前缀匹配" class="headerlink" title="最长前缀匹配"></a>最长前缀匹配</h6><p>longest prefix matching：当给定目标地址查找转发表时，采用最长地址前缀匹配的目标地址表项</p>
-<p>![1672473893265](网络层 - 数据平面&#x2F;1672473893265.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672473893265.png" alt="1672473893265"></p>
 <p>最长前缀匹配：在路由器中经常采用TCAMs（ternary content addressable memories）硬件来完成</p>
 <ul>
 <li>内容可寻址：将地址交给TCAM，它可以在一个时钟周期内检索出地址，不管表空间有多大【通过匹配IP地址的最长前缀对所有IP地址进行分组】</li>
@@ -308,7 +361,7 @@
 <ul>
 <li>Head-of-Line（HOL）blocking：排在队头的数据报阻止了队列中其他数据报向前移动</li>
 </ul>
-<p>![](网络层 - 数据平面&#x2F;9fb86f3e6cab4a9a837dafe9786fdf67.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/9fb86f3e6cab4a9a837dafe9786fdf67.png"></p>
 <p>有些分组在路由器中传着传着会丢就是因为缓冲区溢出了，可能发生在输入端口，也可能发生在输出端口</p>
 <blockquote>
 <p>输入端口缓冲区的主要目的是为了匹配瞬间的输入速率和输出速率的不一致性，防止头端阻塞</p>
@@ -327,7 +380,7 @@
 </ul>
 </li>
 </ul>
-<h5 id="3种典型的交换机构"><a href="#3种典型的交换机构" class="headerlink" title="3种典型的交换机构"></a>3种典型的交换机构</h5><p>![1672474501252](网络层 - 数据平面&#x2F;1672474501252.png)</p>
+<h5 id="3种典型的交换机构"><a href="#3种典型的交换机构" class="headerlink" title="3种典型的交换机构"></a>3种典型的交换机构</h5><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672474501252.png" alt="1672474501252"></p>
 <h6 id="通过内存交换【基于memory】"><a href="#通过内存交换【基于memory】" class="headerlink" title="通过内存交换【基于memory】"></a>通过内存交换【基于memory】</h6><p>第一代路由器采用这种交换机构</p>
 <p>PC机、通用计算机通过软件的方式来实现路由，然后两端插入网卡，通过网卡收来一个分组，通过系统bus（系统总线）把分组交给路由软件，路由软件匹配路由表，然后决定通过哪个网卡发出去，然后网卡把分组封装成帧发出去。</p>
 <p>内存交换具有以下几种特点：</p>
@@ -342,7 +395,7 @@
 <li><p>一次只能转发一个分组</p>
 </li>
 </ul>
-<p>![1672474880299](网络层 - 数据平面&#x2F;1672474880299.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672474880299.png" alt="1672474880299"></p>
 <h6 id="通过总线交换【不是系统总线】"><a href="#通过总线交换【不是系统总线】" class="headerlink" title="通过总线交换【不是系统总线】"></a>通过总线交换【不是系统总线】</h6><p>第一代路由器采用这种交换机构</p>
 <p>输入端口输出端口挂在Fabric，Fabric体现形式就是bus，分组通过bus所有的输出端口都能读到，分组通过bus的时候要加上输出端口的地址，所有输出端口都能拿到，拿到之后匹配一下，如果是我的就收下然后转走，不是就丢掉</p>
 <p>这种交换结构屏蔽了基于memory的路由器的问题——经过system bus两次；而基于bus的经过总线只有1次，所以交换速率要比基于memory的交换速率大很多</p>
@@ -352,7 +405,7 @@
 <li>1次处理一个分组</li>
 <li>1 Gbps bus, Cisco 1900; 32 Gbps bus, Cisco 5600; 对于接入或企业级路由器，速度足够（但不适合区域或骨干网络）</li>
 </ul>
-<p>![1672475267384](网络层 - 数据平面&#x2F;1672475267384.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672475267384.png" alt="1672475267384"></p>
 <h6 id="通过互联网络（crossbar等）的交换"><a href="#通过互联网络（crossbar等）的交换" class="headerlink" title="通过互联网络（crossbar等）的交换"></a>通过互联网络（crossbar等）的交换</h6><ul>
 <li>同时并发转发多个分组，克服总线带宽限制</li>
 <li>Banyan（榕树）网络，crossbar（纵横）和其它的互联网络被开发，将多个处理器连接成多处理器，A向Y转发的同时B也可以向Z转发</li>
@@ -360,14 +413,14 @@
 <li>高级设计：将数据报分片为固定长度的信元，通过交换网络交换，把数据报分成定长的之后还会还原会原来的数据报</li>
 <li>Cisco12000：以60Gbps的交换速率通过互联网络</li>
 </ul>
-<p>![1672475396379](网络层 - 数据平面&#x2F;1672475396379.png)</p>
-<h4 id="输出端口"><a href="#输出端口" class="headerlink" title="输出端口"></a>输出端口</h4><p>![1672550552130](网络层 - 数据平面&#x2F;1672550552130.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672475396379.png" alt="1672475396379"></p>
+<h4 id="输出端口"><a href="#输出端口" class="headerlink" title="输出端口"></a>输出端口</h4><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550552130.png" alt="1672550552130"></p>
 <ul>
 <li>当数据报从交换机构的到达速度比传输速率快就需要输出端口缓存</li>
 <li>由调度规则选择排队的数据报进行传输</li>
 </ul>
 <p>优先权调度并不是采用先到先传，而是根据调度机制来选择具体传的分组</p>
-<h5 id="输出端口排队"><a href="#输出端口排队" class="headerlink" title="输出端口排队"></a>输出端口排队</h5><p>![1672550674894](网络层 - 数据平面&#x2F;1672550674894.png)</p>
+<h5 id="输出端口排队"><a href="#输出端口排队" class="headerlink" title="输出端口排队"></a>输出端口排队</h5><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550674894.png" alt="1672550674894"></p>
 <ul>
 <li>假设交换速率R_switch是R_line的N倍（N：输入端口的数量）</li>
 <li>当多个输入端口同时向输出端口发送时，缓冲该分组（当通过交换网络到达的速率超过输出速率则缓存）</li>
@@ -381,7 +434,7 @@
 </ul>
 </li>
 <li><p>最近的一些推荐：有N（非常大）个流，缓存大小等于</p>
-<p>![1672550779021](网络层 - 数据平面&#x2F;1672550779021.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550779021.png" alt="1672550779021"></p>
 </li>
 </ul>
 <h4 id="调度机制"><a href="#调度机制" class="headerlink" title="调度机制"></a>调度机制</h4><ul>
@@ -394,7 +447,7 @@
 </ul>
 </li>
 </ul>
-<p>![1672550876269](网络层 - 数据平面&#x2F;1672550876269.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550876269.png" alt="1672550876269"></p>
 <h5 id="调度策略：优先权"><a href="#调度策略：优先权" class="headerlink" title="调度策略：优先权"></a>调度策略：优先权</h5><p><em>优先权调度：</em>发送最高优先权的分组</p>
 <ul>
 <li>多类，不同类别有不同的优先权<ul>
@@ -404,18 +457,18 @@
 </ul>
 </li>
 </ul>
-<p>![1672550934694](网络层 - 数据平面&#x2F;1672550934694.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672550934694.png" alt="1672550934694"></p>
 <h5 id="调度策略：其他的"><a href="#调度策略：其他的" class="headerlink" title="调度策略：其他的"></a>调度策略：其他的</h5><h6 id="Round-Robin（RR）scheduling"><a href="#Round-Robin（RR）scheduling" class="headerlink" title="Round Robin（RR）scheduling"></a>Round Robin（RR）scheduling</h6><ul>
 <li>多类</li>
 <li>循环扫描不同类型的队列，发送完一类的一个分组，再发送下一个类的一个分组，循环所有类</li>
 </ul>
-<p>![](网络层 - 数据平面&#x2F;323eb8fabc9e437f9866f83d12a7b853.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/323eb8fabc9e437f9866f83d12a7b853.png"></p>
 <h6 id="Weighted-Fair-Queuing（WEQ）"><a href="#Weighted-Fair-Queuing（WEQ）" class="headerlink" title="Weighted Fair Queuing（WEQ）"></a>Weighted Fair Queuing（WEQ）</h6><ul>
 <li>一般化的Round Robin</li>
 <li>在一段时间内，每个队列得到的服务时间是：W_i &#x2F; (XIGMA(W_i)) * t，和权重成正比</li>
 <li>每个类在每一个循环中获得不同权重的服务量</li>
 </ul>
-<p>![](网络层 - 数据平面&#x2F;c85ee960de49456f9bc71a2e8eca1a71.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/c85ee960de49456f9bc71a2e8eca1a71.png"></p>
 <h2 id="IP-Internet-Protocol"><a href="#IP-Internet-Protocol" class="headerlink" title="IP - Internet Protocol"></a>IP - Internet Protocol</h2><h3 id="概念-1"><a href="#概念-1" class="headerlink" title="概念"></a>概念</h3><p>IP是Internet Protocol 的简称，IP 协议处于 TCP&#x2F;IP 五层模型的网络层，它的主要功能是数据的传输和路由选择。 </p>
 <p>IP 协议是 <strong>TCP&#x2F;IP 协议族</strong> 中的核心协议。 <strong>IP 协议</strong>根据数据**包(Packet)**中的 <strong>IP 地址</strong>， 为上层协议提供一种 <strong>无连接(Connectionless)<strong>，</strong>尽力而为(Best-effort Delivery)</strong> 的数据传输功能。</p>
 <ul>
@@ -429,18 +482,18 @@
 <h3 id="IP地址组成"><a href="#IP地址组成" class="headerlink" title="IP地址组成"></a>IP地址组成</h3><p>IP地址由4部分数字组成，每部分数字对应于8位二进制数字，各部分之间用小数点分开，这是点分二进制，如果换算为十进制我们称为点分十进制。</p>
 <p>每个IP地址由两部分组成<strong>网络地址（NetID）</strong>和<strong>主机地址（HostID）</strong>。网络地址表示其属于互联网中的哪一个网络，而主机地址则表示其属于该网络中的哪一台主机。</p>
 <h3 id="IP地址分类"><a href="#IP地址分类" class="headerlink" title="IP地址分类"></a>IP地址分类</h3><p>IP地址一般可以分为分为A、B、C三类常规地址及D、E两类特殊地址。 </p>
-<p>![](网络层 - 数据平面&#x2F;34f79aeccecc8a8d4778838ecd55278b.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/34f79aeccecc8a8d4778838ecd55278b.png"></p>
 <h4 id="A类地址"><a href="#A类地址" class="headerlink" title="A类地址"></a>A类地址</h4><p>A类地址：范围从0-127，0是保留的并且表示所有IP地址，而127也是保留的地址，并且是用于测试回环用的，因此A类地址的范围其实是从1-126之间。</p>
 <p>如 64.32.16.8，第一段号码为网络号码，剩下的三段号码为本地计算机的号码。转换为二进制来说，一个A类IP地址由8字节的网络地址和24字节的主机地址组成，网络地址的最高位必须是0，可用A类网络有126个，每个网络能容纳一亿多台主机——2的24次方-2主机数。</p>
-<p>![](网络层 - 数据平面&#x2F;9c6f7290ee0a51ff589205eba5242aaa.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/9c6f7290ee0a51ff589205eba5242aaa.png"></p>
 <h4 id="B类地址"><a href="#B类地址" class="headerlink" title="B类地址"></a>B类地址</h4><p>B类地址：范围从128-191，如176.168.128.1，第一和第二段号码为网络号码，剩下的两段号码为本地计算机的号码，转换为二进制来说，一个B类IP地址由16个字节的网络地址和16个字节的主机地址组成，网络地址最高位必须是10。可用的B类网络有16382个，每个网路能容纳6万多个主机——（2的16次方-2）。</p>
-<p>![](网络层 - 数据平面&#x2F;93a5a3bde247573aa72cf73226d7f8b2.png)</p>
-<h4 id="C类地址"><a href="#C类地址" class="headerlink" title="C类地址"></a>C类地址</h4><p>C类地址：范围从192-223，如192.168.1.1，第一、第二、第三段号码为网络号码，剩下的最后一段号码为本地计算机的号码，转换为二进制来说，一个C类IP地址由24字节的网络地址和8字节的主机地址组成，网络地址的最高位必须是110。C类网络可达209万多个，每个网络能容纳254个主机——（2的8次方-2）。<br>![](网络层 - 数据平面&#x2F;3c4accfa49e3e6b6b0324e58a9abc638.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/93a5a3bde247573aa72cf73226d7f8b2.png"></p>
+<h4 id="C类地址"><a href="#C类地址" class="headerlink" title="C类地址"></a>C类地址</h4><p>C类地址：范围从192-223，如192.168.1.1，第一、第二、第三段号码为网络号码，剩下的最后一段号码为本地计算机的号码，转换为二进制来说，一个C类IP地址由24字节的网络地址和8字节的主机地址组成，网络地址的最高位必须是110。C类网络可达209万多个，每个网络能容纳254个主机——（2的8次方-2）。<br><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/3c4accfa49e3e6b6b0324e58a9abc638.png"></p>
 <h4 id="D类地址"><a href="#D类地址" class="headerlink" title="D类地址"></a>D类地址</h4><p>D类地址：范围从224-239，D类IP地址以1110开始，它是一个专门保留的地址，它并不指向特定的网络，目前这一类地址被用在多点广播（Multicast）中。多点广播地址用来一次寻址一组计算机，它表示共享同一协议的一组计算机。 </p>
-<p>![](网络层 - 数据平面&#x2F;f7727d7e80ffcc506bc25034cdde2226.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/f7727d7e80ffcc506bc25034cdde2226.png"></p>
 <h4 id="E类地址"><a href="#E类地址" class="headerlink" title="E类地址"></a>E类地址</h4><p>E类地址：范围从240-254，以11110开始，为将来使用保留。全0（0.0.0.0）地址对应于当前主机。全1的IP地址（255.255.255.255）是当前子网的广播地址。 </p>
-<p>![](网络层 - 数据平面&#x2F;64c23f4d662576f1d3352a398558988d.png)</p>
-<h4 id="数轴表示各类型地址取值范围"><a href="#数轴表示各类型地址取值范围" class="headerlink" title="数轴表示各类型地址取值范围"></a>数轴表示各类型地址取值范围</h4><p>![](网络层 - 数据平面&#x2F;2c6c5341518abdc87ef881a14253ed8c.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/64c23f4d662576f1d3352a398558988d.png"></p>
+<h4 id="数轴表示各类型地址取值范围"><a href="#数轴表示各类型地址取值范围" class="headerlink" title="数轴表示各类型地址取值范围"></a>数轴表示各类型地址取值范围</h4><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/2c6c5341518abdc87ef881a14253ed8c.png"></p>
 <p><strong>只有A,B,C有网络号和主机号之分，D类地址和E类地址没有划分网络号和主机号。A类地址第一组数字为1~126，数字0和127不作为A类地址</strong> </p>
 <h3 id="特殊IP地址"><a href="#特殊IP地址" class="headerlink" title="特殊IP地址"></a>特殊IP地址</h3><h4 id="全1地址"><a href="#全1地址" class="headerlink" title="全1地址"></a>全1地址</h4><p>如：255.255.255.255</p>
 <p>该IP地址指的是受限的广播地址。受限广播地址与一般广播地址（直接广播地址）的区别在于，受限广播地址只能用于本地网络，路由器不会转发以受限广播地址为目的地址的分组；一般广播地址既可在本地广播，也可跨网段广播。例如：主机192.168.1.1&#x2F;30上的直接广播数据包后，另外一个网段192.168.1.5&#x2F;30也能收到该数据报；若发送受限广播数据报，则不能收到。</p>
@@ -452,7 +505,7 @@
 <p>A类私有地址：10.0.0.0&#x2F;8，范围是：10.0.0.0~10.255.255.255</p>
 <p>B类私有地址：172.16.0.0&#x2F;12，范围是：172.16.0.0~172.31.255.255</p>
 <p>C类私有地址：192.168.0.0&#x2F;16，范围是：192.168.0.0~192.168.255.255</p>
-<h3 id="IP数据报格式"><a href="#IP数据报格式" class="headerlink" title="IP数据报格式"></a>IP数据报格式</h3><p>![1672642245915](网络层 - 数据平面&#x2F;1672642245915.png)</p>
+<h3 id="IP数据报格式"><a href="#IP数据报格式" class="headerlink" title="IP数据报格式"></a>IP数据报格式</h3><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672642245915.png" alt="1672642245915"></p>
 <ul>
 <li><strong>版本(Version)：</strong>4位。<strong>IPv4</strong> 是 4， <strong>IPv6</strong> 是 6。</li>
 <li><strong>Internet 首部长度(Internet Header Length, IHL)：</strong>4位。<strong>IPv4</strong> 的首部长度(单位: 32位字)。</li>
@@ -478,10 +531,10 @@
 </ul>
 <p><strong>最大传输单元（MTU）</strong> 是用八位字节指定的可以用在基于包或帧传输的网络，如因特网，传输的最大包或帧的大小。在 Windows 95 中， 默认的 MTU 设为 1500 字节，部分是因为这是以太网的标准 MTU。<strong><strong>因特网</strong></strong>实际上的 MTU 是 576 字节， 但是 ISP 通常建议使用 1500 字节。 </p>
 <h3 id="IP编址"><a href="#IP编址" class="headerlink" title="IP编址"></a>IP编址</h3><p>主机或路由器通过IP地址进行编址，IP地址是一个32位的标示，一个IP地址和路由器或主机的接口关联</p>
-<p>![1672643000577](网络层 - 数据平面&#x2F;1672643000577.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672643000577.png" alt="1672643000577"></p>
 <h3 id="子网-Subnets"><a href="#子网-Subnets" class="headerlink" title="子网(Subnets)"></a>子网(Subnets)</h3><p>IP地址分为子网部分（高位bits）和主机部分（低位bits）</p>
 <p>子网是指一个区域网内的节点（主机或路由器）它们的IP地址的高位部分相同，这些节点构成的网络的一部分叫做子网，子网中各节点相互通信无需路由器接入，子网内各主机可以在物理上相互直接到达（一跳可达）</p>
-<p>![1672643398913](网络层 - 数据平面&#x2F;1672643398913.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672643398913.png" alt="1672643398913"></p>
 <h3 id="子网掩码"><a href="#子网掩码" class="headerlink" title="子网掩码"></a>子网掩码</h3><p>IP地址是以网络号和主机号来标示网络上的主机的，我们把网络号相同的主机称之为本地网络，网络号不相同的主机称之为远程网络主机，本地网络中的主机可以直接相互通信；远程网络中的主机要相互通信必须通过本地网关（Gateway）来传递转发数据。</p>
 <h4 id="子网掩码的概念及作用"><a href="#子网掩码的概念及作用" class="headerlink" title="子网掩码的概念及作用"></a>子网掩码的概念及作用</h4><h4 id="概念-2"><a href="#概念-2" class="headerlink" title="概念"></a>概念</h4><p>子网掩码（Subnet Mask）又叫网络掩码、地址掩码，必须结合IP地址一起对应使用。<strong>子网掩码是用于给IP地址划分网络地址与主机地址的</strong>，和子网掩码1对应的IP地址，代表网络位；和子网掩码0对应的IP地址，代表主机位，只有通过子网掩码，才能表明一台主机所在的子网与其他子网的关系，使网络正常工作。</p>
 <p>子网掩码和IP地址做“与”运算，分离出IP地址中的网络地址和主机地址，用于判断该IP地址是在本地网络上，还是在远程网络网上。子网中只要1是连续的，就是合理子网掩码。子网掩码还用于将网络进一步划分为若干子网，以避免主机过多而拥堵或过少而IP浪费。</p>
@@ -554,7 +607,7 @@
 <p>因此我们只要知道了一个给定的CIDR地址块中的任何一个地址，都能够推算出来这个地址块里面包含多少个IP地址，并且能推算出这个地址块的最小地址和最大地址。 </p>
 <p>由于一个CIDR地址块中有很多地址，所以在路由表中就利用CIDR地址块来查找目的网络，这就是路由聚合的核心思想，它使得路由表中的一个条目可以表示原来传统的有类IP地址的很多个条目，所以路由聚合也称为<strong>超网</strong>，尤其在大规模的网络中，使路由表缩减的效果极其明显。 </p>
 <p>例如：</p>
-<p>![](网络层 - 数据平面&#x2F;%E8%B7%AF%E7%94%B1%E8%81%9A%E5%90%88.jpg)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/%E8%B7%AF%E7%94%B1%E8%81%9A%E5%90%88.jpg"></p>
 <h4 id="最长前缀匹配-1"><a href="#最长前缀匹配-1" class="headerlink" title="最长前缀匹配"></a>最长前缀匹配</h4><p>如果路由表查表转发分组时发现有多条路由可选择时，则选择网络前缀最长的那条进行转发。这样可以使路由更加具体</p>
 <h2 id="DHCP"><a href="#DHCP" class="headerlink" title="DHCP"></a>DHCP</h2><p>DHCP：Dynamic Host Configuration Protocol，作用是允许主机在加入网络的时候，动态地从服务器那里获得IP地址：</p>
 <ul>
@@ -568,9 +621,9 @@
 <li>主机请求IP地址：发送 “DHCP request” 报文</li>
 <li>DHCP服务器发送地址：“DHCP ack” 报文</li>
 </ol>
-<p>![1672665034483](网络层 - 数据平面&#x2F;1672665034483.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672665034483.png" alt="1672665034483"></p>
 <p>假设一个联网笔记本需要获取自己的IP地址，第一条路由器地址和DNS服务器：采用DHCP协议：</p>
-<p>![1672665221376](网络层 - 数据平面&#x2F;1672665221376.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672665221376.png" alt="1672665221376"></p>
 <ol>
 <li>首先DHCP请求被封装在UDP段中，封装在IP数据报中，封装在以太网的帧中。</li>
 <li>以太网帧在局域网范围内广播 (dest: FFFFFFFFFFFF) ，并被运行DHCP服务的路由器收到 </li>
@@ -586,13 +639,13 @@
 <h3 id="NAT的类型"><a href="#NAT的类型" class="headerlink" title="NAT的类型"></a>NAT的类型</h3><p>根据NAT转换是对报文中的源地址进行转换还是对目的地址进行转换，NAT可以分为源NAT、目的NAT和双向NAT</p>
 <h4 id="源NAT"><a href="#源NAT" class="headerlink" title="源NAT"></a>源NAT</h4><p>源NAT在NAT转换时，仅对报文中的源地址进行转换，主要应用于私网用户访问公网的场景。当私网用户主机访问Internet时，私网用户主机发送的报文到达NAT设备后，设备通过源NAT技术将报文中的私网IPv4地址转换成公网IPv4地址，从而使私网用户可以正常访问Internet。</p>
 <p>根据转换时是否同时转换源端口号，源NAT可以细分为如下几种类型，详见下图。</p>
-<p>![](网络层 - 数据平面&#x2F;download.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download.png"></p>
 <h4 id="目的NAT"><a href="#目的NAT" class="headerlink" title="目的NAT"></a>目的NAT</h4><p>目的NAT在NAT转换时，仅对报文中的目的地址和目的端口号进行转换，主要应用于公网用户访问私网服务的场景。当公网用户主机发送的报文到达NAT设备后，设备通过目的NAT技术将报文中的公网IPv4地址转换成私网IPv4地址，从而使公网用户可以使用公网地址访问私网服务。</p>
 <p>根据转换前后的地址是否存在一种固定的映射关系，目的NAT可以细分为如下几种类型，详见下图。</p>
-<p>![](网络层 - 数据平面&#x2F;download%20(1).png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(1).png"></p>
 <h4 id="双向NAT"><a href="#双向NAT" class="headerlink" title="双向NAT"></a>双向NAT</h4><p>双向NAT指的是在转换过程中同时转换报文的源信息和目的信息。双向NAT不是一个单独的功能，而是源NAT和目的NAT的组合。双向NAT是针对同一条流，在其经过设备时同时转换报文的源地址和目的地址。双向NAT主要应用在同时有外网用户访问内部服务器和私网用户访问内部服务器的场景。</p>
 <h4 id="STUN中定义的NAT类型"><a href="#STUN中定义的NAT类型" class="headerlink" title="STUN中定义的NAT类型"></a>STUN中定义的NAT类型</h4><p>在STUN标准中，根据私网IP地址和端口到NAT出口的公网IP地址和端口的映射方式，把NAT分为如下四种类型，详见下图。 </p>
-<p>![](网络层 - 数据平面&#x2F;download%20(2).png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(2).png"></p>
 <ul>
 <li><p><strong>Full Cone NAT（完全锥型NAT）</strong></p>
 <p>所有从同一个私网IP地址和端口（IP1:Port1）发送过来的请求都会被映射成同一个公网IP地址和端口（IP:Port）。并且，任何外部主机通过向映射的公网IP地址和端口发送报文，都可以实现和内部主机进行通信。</p>
@@ -610,7 +663,7 @@
 </li>
 </ul>
 <h3 id="NAPT工作原理"><a href="#NAPT工作原理" class="headerlink" title="NAPT工作原理"></a>NAPT工作原理</h3><p>NAPT在进行地址转换的同时还进行端口转换，可以实现多个私网用户共同使用一个公网IP地址上网。NAPT根据端口来区分不同用户，真正做到了地址复用。 </p>
-<p>![](网络层 - 数据平面&#x2F;download%20(3).png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(3).png"></p>
 <p>当Host访问Web Server时，设备的处理过程如下：</p>
 <ol>
 <li>设备收到Host发送的报文后查找NAT策略，发现需要对报文进行地址转换。</li>
@@ -618,7 +671,7 @@
 <li>设备收到Web Server响应Host的报文后，通过查找会话表匹配到步骤2中建立的表项，将报文的目的地址替换为Host的IP地址，将报文的目的端口号替换为原始的端口号，然后将报文发送至Intranet。</li>
 </ol>
 <h3 id="NAT-Server工作原理"><a href="#NAT-Server工作原理" class="headerlink" title="NAT Server工作原理"></a>NAT Server工作原理</h3><p>使用NAT Server时，需要先在设备上配置公网地址和私网地址的固定映射关系。配置完成后，设备将会生成Server-Map表项，存放公网地址和私网地址的映射关系。该表项将一直存在除非NAT Server的配置被删除。</p>
-<p>![](网络层 - 数据平面&#x2F;download%20(4).png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/download%20(4).png"></p>
 <p>内部Server的私网IPv4地址为192.168.1.2&#x2F;24，对外的公网IPv4地址为1.1.1.10，端口号都为80，它们之间的映射关系在设备上已提前配置好。当Host访问Server时，设备的处理过程如下：</p>
 <ol>
 <li>设备收到Internet上用户访问1.1.1.10的报文的首包后，查找并匹配到Server-Map表项，将报文的目的IP地址转换为192.168.1.2。</li>
@@ -628,16 +681,16 @@
 </ol>
 <h3 id="NAT的应用"><a href="#NAT的应用" class="headerlink" title="NAT的应用"></a>NAT的应用</h3><h4 id="私网用户通过NAPT访问Internet"><a href="#私网用户通过NAPT访问Internet" class="headerlink" title="私网用户通过NAPT访问Internet"></a>私网用户通过NAPT访问Internet</h4><p>在许多小区、学校和企业的私网规划中，由于公网地址资源有限，通常给私网用户分配私网IPv4地址。此时，可以配置源NAT来实现私网用户访问Internet。用户可以根据自己拥有的公网IPv4地址的个数，选择使用NAPT或者Easy IP。</p>
 <p>当用户拥有的公网IP地址个数较多时，配置了NAT设备出接口的IP地址和其他应用之后，还有可用的空闲公网IP地址时，可以选择NAPT。NAPT使用地址池内的IPv4地址作为私网主机转换后的公网IPv4地址。如下图所示，在设备上配置NAPT，实现私网主机访问Internet功能。</p>
-<p>![1672667124873](网络层 - 数据平面&#x2F;1672667124873.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667124873.png" alt="1672667124873"></p>
 <h4 id="私网用户通过Easy-IP访问Internet"><a href="#私网用户通过Easy-IP访问Internet" class="headerlink" title="私网用户通过Easy IP访问Internet"></a>私网用户通过Easy IP访问Internet</h4><p>当用户拥有的公网IPv4地址个数较少时，配置了NAT设备出接口的IPv4地址和其他应用之后，没有可用的空闲公网IPv4地址时，可以选择Easy IP。Easy IP使用出接口的IPv4地址作为私网主机转换后的公网IPv4地址。如下图所示，在设备上配置Easy IP，实现私网主机访问Internet功能。 </p>
-<p>![1672667195297](网络层 - 数据平面&#x2F;1672667195297.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667195297.png" alt="1672667195297"></p>
 <h4 id="公网用户通过NAT-Server访问私网服务器"><a href="#公网用户通过NAT-Server访问私网服务器" class="headerlink" title="公网用户通过NAT Server访问私网服务器"></a>公网用户通过NAT Server访问私网服务器</h4><p>在某些场合，私网中有一些服务器需要向公网用户提供服务，比如私网中部署的一些Web服务器、FTP服务器等，NAT支持这样的应用，此时可以配置NAT Server来实现公网用户访问私网服务器。如下图所示，在设备上配置NAT Server，固定“公网IP地址＋端口号”与“私网IP地址＋端口号”间的映射关系，实现公网主机通过该映射关系访问私网服务器功能。 </p>
-<p>![1672667171436](网络层 - 数据平面&#x2F;1672667171436.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667171436.png" alt="1672667171436"></p>
 <h2 id="IPv6"><a href="#IPv6" class="headerlink" title="IPv6"></a>IPv6</h2><p>IPv6是英文“Internet Protocol Version 6”（互联网协议第6版）的缩写，是用于替代IPv4的下一代IP协议，也就是下一代互联网的协议。</p>
 <p>IPv6的使用，不仅能解决网络地址资源数量的问题，而且也解决了多种接入设备连入互联网的障碍。其128位地址格式将以其在IP地址数量、安全性、移动性、服务质量等方面的巨大优势，改变现代信息生活。</p>
 <p>互联网数字分配机构（IANA）在2016年已向国际互联网工程任务组（IETF）提出建议，要求新制定的国际互联网标准只支持IPv6，不再兼容IPv4。</p>
 <h3 id="IPv6数据报格式"><a href="#IPv6数据报格式" class="headerlink" title="IPv6数据报格式"></a>IPv6数据报格式</h3><p>相比于IPv4，IPv6依旧是固定的40 字节头部，但是数据报传输过程中，不允许分片，如果分组大小超过了传输链路的MTU，将会直接丢弃该分组并向发送端响应错误信息“Packet Too Big”</p>
-<p>![1672668173422](网络层 - 数据平面&#x2F;1672668173422.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672668173422.png" alt="1672668173422"></p>
 <ul>
 <li><strong>Priority：</strong>标示流中数据报的优先级</li>
 <li><strong>Flow Label：</strong> 标示数据报在一个“flow.”  ( “flow”的概念没有被严格的定义)</li>
@@ -653,9 +706,9 @@
 </li>
 </ul>
 <h3 id="IPv6和IPv4的区别"><a href="#IPv6和IPv4的区别" class="headerlink" title="IPv6和IPv4的区别"></a>IPv6和IPv4的区别</h3><p>IP地址（IPV4）由32位正整数来表示，IP地址在计算机中是以二进制的方式处理，但为了方便记忆采用点十进制的标记方式（8位为一组，分四组，每一组都转换为十进制）如下： </p>
-<p>![1672667402023](网络层 - 数据平面&#x2F;1672667402023.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667402023.png" alt="1672667402023"></p>
 <p>与IPv4相比IPv6采用128位的地址，而IPv4使用的是32位。因此新增的地址空间支持2^128 个地址，具体数量340,282,366,920,938,463,463,374,607,431,768,211,456个。这么多的数量足以解决目前IPv4地址量不足的问题。IPv6二进位制下为128位长度，以16位为一组，每组以冒号“:”隔开，可以分为8组： </p>
-<p>![1672667460530](网络层 - 数据平面&#x2F;1672667460530.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672667460530.png" alt="1672667460530"></p>
 <p>IPv6文本格式为xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx:xxxx，其中每个 x 都是十六进制数，表示 4 位。例如：2001:0db8:86a3:08d3:1319:8a2e:0370:7344</p>
 <h3 id="IPv6的优点"><a href="#IPv6的优点" class="headerlink" title="IPv6的优点"></a>IPv6的优点</h3><ol>
 <li><p><strong>更大的地址空间</strong></p>
@@ -682,7 +735,7 @@
 <h4 id="传统方式（per-router）"><a href="#传统方式（per-router）" class="headerlink" title="传统方式（per-router）"></a>传统方式（per-router）</h4><p>传统方式下（per-router），路由器都是通过IP转发的形式对到来的分组按照查路由表的表项，从而决定如何转发，这部分功能处于数据平面，而如何路由（决定路径、计算路由表）这部分功能又处在控制平面。此外还有其他种类繁多的网络设备（中间盒）如：交换机、防火墙、NAT、IDS、负载均衡设备，随着未来不断增加的需求可能还需要更多相应的网络设备。</p>
 <p>传统方式下由于需要不同的设备去实现不同的网络功能，因此每台设备都集成了控制平面和数据平面的功能，控制平面分布式地实现了各种控制平面功能，使得升级和部署网络设备非常困难</p>
 <h4 id="SDN方式"><a href="#SDN方式" class="headerlink" title="SDN方式"></a>SDN方式</h4><p>相比较传统方式SDN采用了逻辑上集中的控制平面，由一个不同的（通常是远程）控制器和CA交互，控制器决定分组转发的逻辑（可编程），由CA所在设备执行逻辑。</p>
-<p>![1672833168742](网络层 - 数据平面&#x2F;1672833168742.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672833168742.png" alt="1672833168742"></p>
 <p>因此相较于传统方式SDN具备了以下优点：</p>
 <ol>
 <li><p><strong>水平集成</strong>控制平面的<strong>开放实现</strong>（而非私有实现），创造出好的产业生态，促进发展</p>
@@ -696,13 +749,13 @@
 </li>
 </ol>
 <h3 id="SDN架构"><a href="#SDN架构" class="headerlink" title="SDN架构"></a>SDN架构</h3><h4 id="数据平面交换机"><a href="#数据平面交换机" class="headerlink" title="数据平面交换机"></a>数据平面交换机</h4><p>数据平面交换机是一个快速，简单，商业化的交换设备，采用硬件实现通用转发功能，流表被控制器计算和安装，基于南向API（例如OpenFlow），SDN控制器访问基于流的交换机，它定义了哪些可以被控制，哪些不能，也定义了和控制器的协议（e.g.,OpenFlow)</p>
-<p>![1672835501755](网络层 - 数据平面&#x2F;1672835501755.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835501755.png" alt="1672835501755"></p>
 <h4 id="SDN控制器"><a href="#SDN控制器" class="headerlink" title="SDN控制器"></a>SDN控制器</h4><p>SDN控制器（网络OS）负责维护网络状态信息， 通过上面的北向API和网络控制应用交互； 通过下面的南向API和网络交换机交互。逻辑上集中，但是在实现上通常由于性能、可扩展性、 容错性以及鲁棒性采用分布式方法 。</p>
-<p>![1672835573794](网络层 - 数据平面&#x2F;1672835573794.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835573794.png" alt="1672835573794"></p>
 <h4 id="网络控制应用"><a href="#网络控制应用" class="headerlink" title="网络控制应用"></a>网络控制应用</h4><p>网络控制应用相当于控制的大脑，它采用下层提供的服务（SDN控制器提供的 API)，实现网络功能。如路由器（交换机）、接入控制（防火墙）、负载均衡等其他功能。控制应用与SDN架构下的其他功能模块是非绑定关系，这意味着它可以被第三方提供 ，与控制器厂商可以不同，与分组交换机厂商也可以不同 </p>
-<p>![1672835925091](网络层 - 数据平面&#x2F;1672835925091.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835925091.png" alt="1672835925091"></p>
 <h3 id="流表"><a href="#流表" class="headerlink" title="流表"></a>流表</h3><p>每个路由器都包含一个流表（被逻辑上集中的控制器计算和分发）</p>
-<p>![1672835980854](网络层 - 数据平面&#x2F;1672835980854.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672835980854.png" alt="1672835980854"></p>
 <h4 id="OpenFlow-数据平面抽象"><a href="#OpenFlow-数据平面抽象" class="headerlink" title="OpenFlow - 数据平面抽象"></a>OpenFlow - 数据平面抽象</h4><p>OpenFlow是一种网络通信协议，属于数据层链路，能够控制网上交换器或路由器的转发平面（forwarding plane），借此改变网络数据包所走的网络路径。 </p>
 <p>OpenFlow通用转发采用简单的分组处理规则，收到分组后会将分组的头部字段和流表进行匹配，对匹配上的分组，可以进行丢弃、转发、修改、将匹配的分组发送给控制器等行为。</p>
 <ul>
@@ -710,9 +763,9 @@
 <li><strong>计数器Counters：</strong>#bytes 以及 #packets</li>
 </ul>
 <p><strong>路由器中的流表定义了路由器的匹配+行动规则</strong> （流表由控制器计算并下发） </p>
-<h4 id="OpenFlow-流表的表项结构"><a href="#OpenFlow-流表的表项结构" class="headerlink" title="OpenFlow - 流表的表项结构"></a>OpenFlow - 流表的表项结构</h4><p>![1672836416872](网络层 - 数据平面&#x2F;1672836416872.png)</p>
+<h4 id="OpenFlow-流表的表项结构"><a href="#OpenFlow-流表的表项结构" class="headerlink" title="OpenFlow - 流表的表项结构"></a>OpenFlow - 流表的表项结构</h4><p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672836416872.png" alt="1672836416872"></p>
 <p><strong>例子</strong></p>
-<p>![1672836601682](网络层 - 数据平面&#x2F;1672836601682.png)</p>
+<p><img src="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/1672836601682.png" alt="1672836601682"></p>
 
     </div>
 
