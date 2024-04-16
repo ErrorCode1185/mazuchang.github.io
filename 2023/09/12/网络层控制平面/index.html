@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 6.3.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"mazuchang.github.io","root":"/","scheme":"Gemini","version":"7.8.0","exturl":false,"sidebar":{"position":"left","width":320,"display":"post","padding":18,"offset":12,"onmobile":true},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}};
+  </script>
+
+  <meta name="description" content="网络层 - 控制平面路由选择算法路由（route）的概念在前面介绍网络层关键功能时提到路由就是指按照某种指标（传输延迟，所经过的站点数目等）找到一条从源节点到目标节点的较好路径  较好路径：按照某种指标较小的路径 指标：站数、延迟、费用、队列长度等，或者是一些单纯指标的加权平均  采用什么样的指标表示网络使用者希望网络在什么方面表现突出，换句话说也就是什么指标网路使用者比较重视。 例如以网络为单位">
+<meta property="og:type" content="article">
+<meta property="og:title" content="网络层 - 控制平面">
+<meta property="og:url" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/index.html">
+<meta property="og:site_name" content="mazuchang">
+<meta property="og:description" content="网络层 - 控制平面路由选择算法路由（route）的概念在前面介绍网络层关键功能时提到路由就是指按照某种指标（传输延迟，所经过的站点数目等）找到一条从源节点到目标节点的较好路径  较好路径：按照某种指标较小的路径 指标：站数、延迟、费用、队列长度等，或者是一些单纯指标的加权平均  采用什么样的指标表示网络使用者希望网络在什么方面表现突出，换句话说也就是什么指标网路使用者比较重视。 例如以网络为单位">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160119053.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160218524.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160755865.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673161576185.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673161829594.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162432652.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162661233.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162746812.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162920757.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673163314183.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673163344653.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673164539675.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673164969868.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673165469524.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673266472970.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673274871800.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673275116093.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673275531072.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673275601944.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673433974780.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673434585721.png">
+<meta property="og:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673434771942.png">
+<meta property="article:published_time" content="2023-09-11T16:00:00.000Z">
+<meta property="article:modified_time" content="2024-04-16T13:14:17.386Z">
+<meta property="article:author" content="mazuchang">
+<meta property="article:tag" content="计算机网络">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160119053.png">
+
+<link rel="canonical" href="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>网络层 - 控制平面 | mazuchang</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">mazuchang</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">读万卷书，行万里路。</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+  </ul>
+</nav>
+
+
+
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://mazuchang.github.io/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="mazuchang">
+      <meta itemprop="description" content="前行纵然步履维艰，你仍旧走在正确的道路上。">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="mazuchang">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          网络层 - 控制平面
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2023-09-12 00:00:00" itemprop="dateCreated datePublished" datetime="2023-09-12T00:00:00+08:00">2023-09-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2024-04-16 21:14:17" itemprop="dateModified" datetime="2024-04-16T21:14:17+08:00">2024-04-16</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" itemprop="url" rel="index"><span itemprop="name">计算机网络</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="网络层-控制平面"><a href="#网络层-控制平面" class="headerlink" title="网络层 - 控制平面"></a>网络层 - 控制平面</h1><h2 id="路由选择算法"><a href="#路由选择算法" class="headerlink" title="路由选择算法"></a>路由选择算法</h2><h3 id="路由（route）的概念"><a href="#路由（route）的概念" class="headerlink" title="路由（route）的概念"></a>路由（route）的概念</h3><p>在前面介绍<a href="#%E7%BD%91%E7%BB%9C%E5%B1%82%E5%85%B3%E9%94%AE%E5%8A%9F%E8%83%BD">网络层关键功能</a>时提到路由就是指按照某种指标（传输延迟，所经过的站点数目等）找到一条从源节点到目标节点的较好路径</p>
+<ul>
+<li><strong>较好路径：</strong>按照某种指标较小的路径</li>
+<li><strong>指标：</strong>站数、延迟、费用、队列长度等，或者是一些单纯指标的加权平均</li>
+</ul>
+<p>采用什么样的指标表示网络使用者希望网络在什么方面表现突出，换句话说也就是什么指标网路使用者比较重视。</p>
+<p>例如以网络为单位进行路由采用的就是路由信息通告 + 路由计算方式，网络为单位进行路由的优势在于路由信息传输、计算和匹配的代价低，前提条件是：一个网络所有节点地址前缀相同，且物理上聚集。</p>
+<h3 id="路由选择算法的原则"><a href="#路由选择算法的原则" class="headerlink" title="路由选择算法的原则"></a>路由选择算法的原则</h3><ul>
+<li><p><strong>正确性（correctness)</strong></p>
+<p>算法必须是<strong>正确</strong>的和<strong>完整</strong>的，使分组一站一站接力，正确发向目标站</p>
+</li>
+<li><p><strong>简单性（simplicity）</strong></p>
+<p>算法在计算机上应简单：最优但复杂的算法，时间上延迟很大，不实用，不应为了获取路由信息增加很多的通信量</p>
+</li>
+<li><p><strong>健壮性（robustness）</strong></p>
+<p>算法应能适应<strong>通信量</strong>和<strong>网络拓扑</strong>的变化：通信量变化，网络拓扑的变化算法能很快适应； 不向很拥挤的链路发数据，不向断了的链路发送数据 </p>
+</li>
+<li><p><strong>稳定性（stability）</strong></p>
+<p>产生的路由不应该摇摆</p>
+</li>
+<li><p><strong>公平性（fairness）</strong></p>
+<p>对每一个站点都公平</p>
+</li>
+<li><p><strong>最优性（optimality）</strong></p>
+<p>某一个指标的最优，时间上，费用上，等指标，或综合指标；实际上，获取最优的结果代价较高，可以是次优的</p>
+</li>
+</ul>
+<h3 id="路由选择算法分类"><a href="#路由选择算法分类" class="headerlink" title="路由选择算法分类"></a>路由选择算法分类</h3><h4 id="按全局或分布式分类"><a href="#按全局或分布式分类" class="headerlink" title="按全局或分布式分类"></a>按全局或分布式分类</h4><ul>
+<li><p><strong>全局</strong></p>
+<p>所有的路由器拥有完整的拓扑和边的代价信息</p>
+<p>“link state”思想</p>
+</li>
+<li><p><strong>分布式</strong></p>
+<p>路由器只知道与它有物理连接关系的邻居路由器，和到相应邻居路由器的代价值，需要迭代的与邻居交换路由信息及计算路由信息</p>
+<p>“distance vector”思想</p>
+</li>
+</ul>
+<h4 id="按静态或动态分类"><a href="#按静态或动态分类" class="headerlink" title="按静态或动态分类"></a>按静态或动态分类</h4><ul>
+<li><strong>静态：</strong>静态随时间变化缓慢</li>
+<li><strong>动态：</strong>路由变化很快，可以周期性更新路由信息，也可以根据链路代价的变化而变化</li>
+</ul>
+<p>静态的路由选择算法是一种非自适应算法（non-adaptive algorithm）：不能使用网络拓扑和通信量的变化，路由表是实现计算好的</p>
+<p>动态的路由选择算法是一种自适应路由选择（adaptive algorithm）：能适应网络拓扑和通信量的变化</p>
+<h3 id="链路状态路由选择-link-state-routing"><a href="#链路状态路由选择-link-state-routing" class="headerlink" title="链路状态路由选择(link state routing)"></a>链路状态路由选择(link state routing)</h3><p>在链路状态算法（简称LS算法）中，网络拓扑和所有的链路开销都是已知的，也就是说这些条件可以作为LS算法的输入，实践中这是通过让每个节点向网络中所有其他节点广播链路状态分组来完成的，其中每个链路状态分组包含它所连接的链路的标识和开销</p>
+<h4 id="基本工作过程"><a href="#基本工作过程" class="headerlink" title="基本工作过程"></a>基本工作过程</h4><ol>
+<li><p><strong>发现相邻节点，获知对方网络地址</strong></p>
+<p>一个路由器上电之后，向所有线路发送HELLO分组，其它路由器收到HELLO分组，回送应答，在应答分组中告知自己的名字(全局唯一) ，在LAN中，通过广播HELLO分组，获得其它路由器的信息,，可以认为引入一个人工节点</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160119053.png" alt="1673160119053"></p>
+</li>
+<li><p><strong>测量到相邻节点的代价</strong>（延迟,开销）</p>
+<p>实测法，发送一个分组要求对方立即响应回送一个ECHO分组， 通过测量时间可以估算出延迟情况</p>
+</li>
+<li><p><strong>组装一个LS分组,描述它到相邻节点的代价情况</strong></p>
+<p>需要通过发送者名称、序号、年龄、列表，给出它相邻节点和它到相邻节点的延迟</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160218524.png" alt="1673160218524"></p>
+</li>
+<li><p><strong>将分组通过扩散的方法发到所有其它路由器</strong></p>
+<p>需要由一个顺序号用于控制无穷的扩散，每个路由器都记录（源路由器、顺序号)，发现重复的或老的就不扩散</p>
+<p><strong>可能出现的问题</strong>：</p>
+<ul>
+<li>循环使用问题</li>
+<li>路由器崩溃之后序号会从0开始</li>
+<li>序号出现错误</li>
+</ul>
+<p>解决上述问题的办法是添加一个<strong>age</strong>（年龄）字段，每生成一个分组时，age字段不为0，每一个时间段，age字段减1，age字段为0的分组将被抛弃</p>
+<p><strong>扩散分组的数据结构</strong>：</p>
+<ul>
+<li><strong>Source：</strong>从哪个节点收到LS分组</li>
+<li><strong>Seq，Age：</strong>序号，年龄</li>
+<li><strong>Send flags：</strong>发送标记，必须向指定的那些相邻站点转发LS分组</li>
+<li><strong>ACK flags：</strong>本站点必须向哪些相邻站点发送应答</li>
+<li><strong>DATA：</strong>来自source站点的LS分组</li>
+</ul>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673160755865.png" alt="1673160755865"></p>
+<p>经过以上4步能让每个路由器获得拓扑和边代价</p>
+</li>
+<li><p><strong>通过Dijkstra算法找出最短路径</strong>（这才是路由算法） </p>
+<ol>
+<li>每个节点独立算出来到其他节点（路由器&#x3D;网络）的最短路径</li>
+<li>迭代算法：第k步能够知道本节点到k个其他节点的最短路径</li>
+</ol>
+<p>路由器获得各站点LS分组和整个网络的拓扑，通过Dijkstra算法计算出到其它各路由器的最短 路径（汇集树）将计算结果安装到路由表中</p>
+</li>
+</ol>
+<h4 id="LS的应用情况"><a href="#LS的应用情况" class="headerlink" title="LS的应用情况"></a>LS的应用情况</h4><p>OSPF协议是一种LS协议,被用于Internet上</p>
+<p> IS-IS(intermediate system- intermediate  system): 被用于Internet主干中, Netware</p>
+<h4 id="LS路由选择算法的工作原理"><a href="#LS路由选择算法的工作原理" class="headerlink" title="LS路由选择算法的工作原理"></a>LS路由选择算法的工作原理</h4><p>将每个节点按**(D(v), p(v))**的形式标记，D(v)表示从源节点到节点V的当前路径代价(节点的代价) ；p(v)表示从源到节点V的路径前序节点</p>
+<p>将节点分为临时节点跟永久节点</p>
+<ul>
+<li>临时节点(tentative node) :还没有找到从源节点到此节点的最优路径的节点 </li>
+<li>永久节点(permanent node) N’:已经找到了从源节点到此节点的最优路径的节点</li>
+</ul>
+<p>初始化时除了源节点外，所有节点都为临时节点；节点代价除了与源节点代价相邻的节点外都为无穷大。之后从所有临时节点中找到一个节点代价最小的临时节点，将它变成永久节点(当前节点)W，对此节点的所有在临时节点集合中的邻节点(V)，如 D(v)&gt;D(w) + c(w,v)，则重新标注此点， (D(W)+C(W,V), W) 否则，不重新标注。如此循环，直到找到最优路径。</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673161576185.png" alt="1673161576185"></p>
+<h4 id="Dijkstra算法总结"><a href="#Dijkstra算法总结" class="headerlink" title="Dijkstra算法总结"></a>Dijkstra算法总结</h4><h5 id="算法复杂度"><a href="#算法复杂度" class="headerlink" title="算法复杂度"></a>算法复杂度</h5><p>假设共有n节点，每一次迭代都需要检查所有不在永久集合N中节点，则共有n(n+1)&#x2F;2 次比较，时间复杂度： O(n2 ) ，有很有效的实现可以达到 O(nlogn) </p>
+<h5 id="可能的震荡"><a href="#可能的震荡" class="headerlink" title="可能的震荡"></a>可能的震荡</h5><p>e.g.,链路代价&#x3D;链路承载的流量:</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673161829594.png" alt="1673161829594"></p>
+<h3 id="距离矢量路由选择-distance-vector-routing"><a href="#距离矢量路由选择-distance-vector-routing" class="headerlink" title="距离矢量路由选择(distance vector routing)"></a>距离矢量路由选择(distance vector routing)</h3><p>距离矢量算法（简称DV算法）是一种迭代的、异步的和分布式的算法，在距离矢量算法中，每个节点都要从一个或多个直接相连邻居接收某些信息，执行计算，让后将其计算结果分发给邻居，在此过程中一直要持续到邻居之间无更多信息要交换为止，并且各节点间数据交换可以是不一致的。</p>
+<h4 id="基本思想"><a href="#基本思想" class="headerlink" title="基本思想"></a>基本思想</h4><p>各路由器维护一张路由表，路由表中记录本节点到相邻N个节点的代价，之后各路由器与相邻路由器交换路由表，根据获得的路由信息，更新路由表</p>
+<ul>
+<li><p><strong>代价及相邻节点间代价的获得</strong></p>
+<p>通过实测获取到相邻节点间的代价，包括跳数(hops)，延迟(delay)，队列长度等信息</p>
+</li>
+<li><p><strong>路由信息的更新</strong></p>
+<p>根据实测得到本节点A到相邻站点的代价（如:延迟）并根据各相邻站点声称它们到目标站点B的代价，计算出本站点A经过各相邻站点到目标站点B的代价，找到一个最小的代价，和相应的下一个节点Z，到达节点 B经过此节点Z，并且代价为A-Z-B的代价</p>
+</li>
+</ul>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162432652.png" alt="1673162432652"></p>
+<h4 id="距离矢量算法"><a href="#距离矢量算法" class="headerlink" title="距离矢量算法"></a>距离矢量算法</h4><p>Bellman-Ford 方程(动态规划)</p>
+<p>设dx (y)是从x到y的最小路径代价，那么 dx (y) &#x3D; min {c(x,v) + dv (y) } </p>
+<p>其中min代表示取所有x的邻居取最小的v，c表示x到邻居v的代价，dv(y)表示邻居v到目标y的代价</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162661233.png" alt="1673162661233"></p>
+<h5 id="核心思路"><a href="#核心思路" class="headerlink" title="核心思路"></a>核心思路</h5><p>每个节点都将自己的距离矢量估计值传送给邻居，定时或者DV有变化时，让对方去算，当x从邻居收到DV时，自己运算，采用B-F equation更新它自己的距离矢量</p>
+<p> <img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162746812.png" alt="1673162746812"></p>
+<p>Dx (y)估计值最终收敛于实际的最小代价值dx (y) </p>
+<p><strong>距离矢量算法本质上是一种分布式、迭代算法</strong></p>
+<ul>
+<li><strong>异步式迭代：</strong>每次当本地链路代价变化了、从邻居来了DV的更新消息都会触发迭代</li>
+<li><strong>分布式：</strong>每个节点只是在自己的DV改 变之后向邻居通告，邻居们只在有必要的时候通知他们的邻居</li>
+</ul>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673162920757.png" alt="1673162920757"></p>
+<h5 id="DV的无穷计算问题"><a href="#DV的无穷计算问题" class="headerlink" title="DV的无穷计算问题"></a>DV的无穷计算问题</h5><p>DV算法的特点：好消息传的快，坏消息传的慢</p>
+<ul>
+<li><p><strong>好消息传播快</strong></p>
+<p>好消息的传播以每一个交换周期前进一个路由器的速度进行 </p>
+<p><strong>好消息</strong>：某个路由器接入或有更短的路径</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673163314183.png" alt="1673163314183"></p>
+</li>
+<li><p><strong>坏消息传播慢</strong>(无穷计算问题) </p>
+<p>例如第一次交换之后，B从C处获得信息，C可以到达A(C-A，要经过B本身)，但是路径是2，因此B变成3，从C处走</p>
+<p>第二次交换，C从B处获得消息，B可以到达A，路径为3，因此C到A从B走，代价为3，无限次之后，到A的距离变成INF，不可达 </p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673163344653.png" alt="1673163344653"></p>
+</li>
+</ul>
+<h5 id="水平分裂-split-horizon-算法"><a href="#水平分裂-split-horizon-算法" class="headerlink" title="水平分裂(split horizon)算法"></a>水平分裂(split horizon)算法</h5><p> 水平分裂(split horizon)算法是一种对无穷计算问题的解决办法</p>
+<h6 id="算法描述"><a href="#算法描述" class="headerlink" title="算法描述"></a>算法描述</h6><p>C知道要经过B才能到达A，所以C向B报告它到A的距离为INF；C告诉D它到A的真实距离，D告诉E它到A的距离，但D告诉C它通向A的距离为INF，第一次交换: B通过测试发现到A的路径为INF，而C也告诉B到A的距离为INF，因此B到A的距离为INF</p>
+<p> 水平分裂算法在某些拓扑形式下会失败（存在环路） </p>
+<h3 id="LS和DS算法的比较"><a href="#LS和DS算法的比较" class="headerlink" title="LS和DS算法的比较"></a>LS和DS算法的比较</h3><ul>
+<li><p><strong>消息复杂度</strong></p>
+<p>DV胜出</p>
+<p>LS：有n节点，E条链路，发送报文O(nE)个。局部的路由信息；全局传播</p>
+<p>DV：只和邻居交换信息。全局的路由信息，局部传输</p>
+</li>
+<li><p><strong>收敛时间</strong></p>
+<p>LS胜出</p>
+<p>LS：时间复杂度O(n2) ，有可能震荡</p>
+<p>DV：收敛较慢，可能存在路由环路以及count-to-infinity问题</p>
+</li>
+<li><p><strong>健壮性</strong></p>
+<p>LS胜出</p>
+<p>LS：节点会通告不正确的链路代价，每个节点只计算自己的路由表，错误的信息影响较小，局部，路由较健壮</p>
+<p>DV：DV节点可能通告对全网所有节点的不正确路径代价（距离矢量），每个节点的路由表可能被其他节点使用，错误可以扩散到全网</p>
+</li>
+</ul>
+<p><strong>DV算法通常应用中企业网及其他较小型的网络中，大型网络通常采用LS算法</strong></p>
+<h2 id="因特网中自治系统内部的路由选择"><a href="#因特网中自治系统内部的路由选择" class="headerlink" title="因特网中自治系统内部的路由选择"></a>因特网中自治系统内部的路由选择</h2><h3 id="路由信息协议-RIP"><a href="#路由信息协议-RIP" class="headerlink" title="路由信息协议 - RIP"></a>路由信息协议 - RIP</h3><p>RIP ( Routing Information Protocol) 在1982年发布的BSD-UNIX中实现，采用Distance vector 算法。距离矢量：每条链路cost&#x3D;1，# of hops (max &#x3D; 15 hops) 跳数，DV每隔30秒和邻居交换DV（通告），每个通告最多包含25个目标子网</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673164539675.png" alt="1673164539675"></p>
+<h4 id="RIP链路失效和恢复"><a href="#RIP链路失效和恢复" class="headerlink" title="RIP链路失效和恢复"></a>RIP链路失效和恢复</h4><p>如果180秒没有收到通告信息表示邻居或者链路失效，当发现经过这个邻居的路由已失效，新的通告报文会传递给邻居，邻居因此发出新的通告 （如果路由变化的话），链路失效快速地在整网中传输， 使用毒性逆转（poison reverse）阻止ping-pong回路（不可达的距离：跳数无限 &#x3D; 16 段）</p>
+<h4 id="RIP进程处理"><a href="#RIP进程处理" class="headerlink" title="RIP进程处理"></a>RIP进程处理</h4><p>RIP以应用进程的方式实现：route-d (daemon) ，通告报文通过UDP报文传送，周期性重复，网络层的协议使用了传输层的服务，以应用层实体的方式实现</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673164969868.png" alt="1673164969868"></p>
+<h3 id="开放最短路优先-OSRF"><a href="#开放最短路优先-OSRF" class="headerlink" title="开放最短路优先 - OSRF"></a>开放最短路优先 - OSRF</h3><p>OSPF (Open Shortest Path First) —— “open”：标准可公开获得</p>
+<p>OSRF使用LS算法，LS 分组在网络中（一个AS内部）分发，全局网络拓扑、代价在每一个节点中都保持，路由计算采用Dijkstra算法。OSPF通告信息中携带：每一个邻居路由器一个表项，通告信息会传遍AS全部（通过泛洪），在IP数据报上直接传送OSPF报文。（而不是通过UDP和TCP）IS-IS路由协议：几乎和OSPF一样</p>
+<h4 id="OSRF“高级”特性-RIP不具备"><a href="#OSRF“高级”特性-RIP不具备" class="headerlink" title="OSRF“高级”特性(RIP不具备)"></a>OSRF“高级”特性(RIP不具备)</h4><ul>
+<li><p><strong>安全</strong></p>
+<p>所有的OSPF报文都是经过认证的 (防止恶意的攻击)</p>
+</li>
+<li><p><strong>允许有多个代价相同的路径存在</strong></p>
+<p>在RIP协议中只有一个</p>
+</li>
+<li><p><strong>对于每一个链路，对于不同的TOS有多重代价矩阵</strong></p>
+<p>例如：卫星链路代价对于尽力而为的服务代价设置比较低，对实时服务代价设置的比较高；支持按照不同的代价计算最优路径，如：按照时间和延迟分别计算最优路径</p>
+</li>
+<li><p><strong>对单播和多播的集成支持</strong></p>
+<p>Multicast OSPF (MOSPF) 使用相同的拓扑数据库，就像在OSPF中一样</p>
+</li>
+<li><p><strong>在大型网络中支持层次性OSP</strong></p>
+</li>
+</ul>
+<h4 id="层次化的OSRF路由"><a href="#层次化的OSRF路由" class="headerlink" title="层次化的OSRF路由"></a>层次化的OSRF路由</h4><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673165469524.png" alt="1673165469524"></p>
+<ul>
+<li><p><strong>2个级别的层次性：本地，骨干</strong></p>
+<p>链路状态通告仅仅在本地区域Area范围内进行，每一个节点拥有本地区域的拓扑信息；关于其他区域，知道去它的方向，通过区域边界路由器（最短路径）</p>
+</li>
+<li><p><strong>区域边界路由器</strong></p>
+<p>“汇总（聚集）”到自己区域内网络的距离，向其它区域边界路由器通告</p>
+</li>
+<li><p><strong>骨干路由器</strong></p>
+<p>仅仅在骨干区域内，运行OSPF路由</p>
+</li>
+<li><p><strong>边界路由器</strong></p>
+<p>连接其它的AS’s</p>
+</li>
+</ul>
+<h2 id="ISP之间的路由选择：BGP"><a href="#ISP之间的路由选择：BGP" class="headerlink" title="ISP之间的路由选择：BGP"></a>ISP之间的路由选择：BGP</h2><h3 id="层次路由"><a href="#层次路由" class="headerlink" title="层次路由"></a>层次路由</h3><h4 id="平面路由"><a href="#平面路由" class="headerlink" title="平面路由"></a>平面路由</h4><p>假设一个网络中所有的路由器地位都一样，都可以通过LS、DV或其他路由选择算法进行路由选择，所有路由器都可以直到其他所有路由器如何走，换句话说所有路由器都在一个平面</p>
+<h5 id="平面路由的问题"><a href="#平面路由的问题" class="headerlink" title="平面路由的问题"></a>平面路由的问题</h5><p>在规模巨大的网络中，路由信息的存储、传输和计算代价巨大</p>
+<ul>
+<li>DV：距离矢量很大，且不能够收敛 </li>
+<li>LS：几百万个节点的LS分组的泛洪传输，存储以及最短路径算法的计算</li>
+</ul>
+<p>同时也会带来管理上的问题，例如：不同的网络所有者希望按照自己的方式管理网络；希望对外隐藏自己网络的细节同时还希望和其它网络互联。</p>
+<h4 id="层次路由-1"><a href="#层次路由-1" class="headerlink" title="层次路由"></a>层次路由</h4><p>层次路由是指将互联网分成一个个AS（路由器区域），一个AS用AS Number（ASN）进行唯一标识，一个ISP中可能包含一个或多个AS。</p>
+<ul>
+<li>AS：某个区域内的路由器集合，自治系统 “autonomous systems”</li>
+</ul>
+<p>层次路由将路由分成了两个层次，在同一个AS内路由器运行相同的路由协议（“intra-AS” routing  protocol：<strong>内部网关协议</strong>，不同的AS可能运行着不同的内部网关协议）用于解决规模和管理问题。如RIP，OSRF，IGRP，通过网关路由器（AS边缘路由器）可以连接到其他的AS，AS之间运行着<strong>AS间路由协议</strong>（“inter-AS” routing  protocol：外部网关协议）用于解决AS之间的路由问题，完成AS之间的互联互通</p>
+<h5 id="层次路由的优点"><a href="#层次路由的优点" class="headerlink" title="层次路由的优点"></a>层次路由的优点</h5><p>层次路由通过内部网关协议可以有效解决规模问题和管理问题</p>
+<p>规模问题可以通过内部网关协议解决，只需要解决AS内部数量有限的路由器相互到达的问题，就可以使AS内部规模可控，如AS节点太多，可分割AS，使得AS内部的节点数量有限。此外各个AS可以运行不 同的内部网关协议，这样就可以使自己网络的细节不向外透露，管理问题也迎刃而解。</p>
+<p>总结就是层次路由扩展性强：规模增大，性能不会减得太多</p>
+<h3 id="互联网AS间的路由：BGP"><a href="#互联网AS间的路由：BGP" class="headerlink" title="互联网AS间的路由：BGP"></a>互联网AS间的路由：BGP</h3><p>BGP（Border Gateway Protocol): 自治区域间路由协议“事实上的”标准，可以形象地将它比作是“将互联网各个AS粘在一起的胶水”。</p>
+<p>BGP提供给每个AS以下方法：</p>
+<ul>
+<li>eBGP：从相邻的ASes那里获得子</li>
+<li></li>
+<li>网可达信息</li>
+<li>iBGP：将获得的子网可达信息传遍到AS内部的所有路由器</li>
+</ul>
+<p>最后根据子网可达信息和策略来决定到达子网的“最短”路径，BGP基于距离矢量算法（路径矢量），允许子网向互联网其他网络通告“我在这里” 的信息。</p>
+<h4 id="eBGP、iBGP连接"><a href="#eBGP、iBGP连接" class="headerlink" title="eBGP、iBGP连接"></a>eBGP、iBGP连接</h4><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673266472970.png" alt="1673266472970"></p>
+<p>BGP会话就是两个BGP路由器(“peers”)在一个半永久的TCP连接上交换BGP报文：通告向不同目标子网前缀的“路径”（BGP是一个“路径 矢量”协议）</p>
+<p>当AS3网关路由器3a向AS2的网关路由器2c通告路径： AS3,X。3a参与AS内路由运算，知道本AS所有子网X信息。语义上：AS3向AS2承诺，它可以向子网X转发数据报，3a是2c关于X的下一跳（next hop）</p>
+<h4 id="路径的属性及BGP路由"><a href="#路径的属性及BGP路由" class="headerlink" title="路径的属性及BGP路由"></a>路径的属性及BGP路由</h4><p>当通告一个子网前缀时，通告包括 BGP 属性：prefix + attributes &#x3D; “route”</p>
+<p>BGP共有两个重要属性：</p>
+<ul>
+<li><p>AS-PATH：前缀的通告所经过的AS列表：AS 67 AS 17</p>
+<p>AS-PATH被用于检测环路及多路径选择，在向其它AS转发时，需要将自己的AS号加在路径上</p>
+</li>
+<li><p>NEXT-HOP：从当前AS到下一跳AS有多个链路</p>
+<p>在NETX-HOP属性中，告诉对方通过哪个I转发</p>
+</li>
+<li><p>其它属性：路由偏好指标，如何被插入的属性</p>
+</li>
+</ul>
+<h5 id="基于策略的路由"><a href="#基于策略的路由" class="headerlink" title="基于策略的路由"></a>基于策略的路由</h5><p>当一个网关路由器接收到了一个路由通告，使用输入策略来接受或过滤（accept&#x2F;decline.），过滤原因：</p>
+<ol>
+<li>不想经过某个AS，转发某些前缀的分组</li>
+<li>已经有了一条往某前缀的偏好路径</li>
+</ol>
+<p>策略也决定了是否向它别的邻居通告收到的这个路由信息</p>
+<h4 id="BGP路径通告"><a href="#BGP路径通告" class="headerlink" title="BGP路径通告"></a>BGP路径通告</h4><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673274871800.png" alt="1673274871800"></p>
+<p>路由器AS2.2c从AS3.3a接收到的AS3,X路由通告 （<strong>通过eBGP</strong>），基于AS2的输入策略，AS2.2c决定接收AS3,X的通告，而且<strong>通过iBGP</strong>向AS2的所有路由器进行通告，基于AS2的策略，AS2路由器2a通过eBGP向AS1.1c路由器通告AS2,AS3,X 路由信息。（路径上加上了 AS2自己作为AS序列的一跳）</p>
+<p>网关路由器可能获取有关一个子网X的多条路径，从多个eBGP会话上：</p>
+<p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673275116093.png" alt="1673275116093"></p>
+<ol>
+<li>AS1 网关路由器1c从2a处学习到路径：AS2,AS3,X</li>
+<li>AS1 网关路由器1c从3a处学习到路径：AS3,X</li>
+<li>基于策略，AS1路由器1c选择了路径：AS3,X，而且通过iBGP告诉所有AS1内部的路由器</li>
+</ol>
+<h4 id="BGP报文"><a href="#BGP报文" class="headerlink" title="BGP报文"></a>BGP报文</h4><p>BGP使用TCP协议交换BGP报文</p>
+<p>BGP报文：</p>
+<ul>
+<li><strong>OPEN</strong>：打开TCP连接，认证发送方</li>
+<li><strong>UPDATE</strong>：通告新路径（或者撤销原路径）</li>
+<li><strong>KEEPALIVE</strong>：在没有更新时保持连接，也用于对 OPEN请求确认</li>
+<li><strong>NOTIFICATION</strong>：报告以前消息的错误，也用来关闭连接</li>
+</ul>
+<h2 id="BGP和OSRF转发表表项"><a href="#BGP和OSRF转发表表项" class="headerlink" title="BGP和OSRF转发表表项"></a>BGP和OSRF转发表表项</h2><h3 id="BGP路径选择"><a href="#BGP路径选择" class="headerlink" title="BGP路径选择"></a>BGP路径选择</h3><p>路由器可能获得一个网络前缀的多个路径，路由器必须进行路径的选择，路由选择可以基于：</p>
+<ol>
+<li>本地偏好值属性：偏好策略决定</li>
+<li>最短AS-PATH：AS的跳数</li>
+<li>最近的NEXT-HOP路由器：<strong>热土豆路由</strong></li>
+<li>附加的判据：使用BGP标示</li>
+</ol>
+<p>一个前缀对应着多种路径，采用消除规则直到留下一条路径</p>
+<h4 id="热土豆路由"><a href="#热土豆路由" class="headerlink" title="热土豆路由"></a>热土豆路由</h4><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673275531072.png" alt="1673275531072"></p>
+<p>2d通过iBGP获知，它可以通过2a或者2c到达X</p>
+<p><strong>热土豆策略</strong>：选择具备最小内部区域代价的网关作为往X 的出口（如：2d选择2a，即使往X可能有比较多的AS跳 数）：不要操心域间的代价！</p>
+<h3 id="BGP-通过路径通告执行策略"><a href="#BGP-通过路径通告执行策略" class="headerlink" title="BGP: 通过路径通告执行策略"></a>BGP: 通过路径通告执行策略</h3><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673275601944.png" alt="1673275601944"></p>
+<ul>
+<li>A,B,C 是 提供商网络</li>
+<li>X,W,Y 是桩网络（stub networks）或者叫端网络</li>
+<li>X 是双重接入的，多宿桩网络，接入了2个网络</li>
+<li>策略强制让X<ul>
+<li>X不想路由从B通过X到C的分组</li>
+<li>因而X就不通告给B，它实际上可以路由到C</li>
+</ul>
+</li>
+</ul>
+<p>假设一个ISP只想路由流量到（去）往它的客户网络，不想承载其他ISPs之间的流量（即不通告：不是去往我的客户，也不是来自我的客户）</p>
+<p>此时A向B和C通告路径Aw，B<strong>选择不向C通告BAw</strong>，因为B从CBAw的路由上无法获得收益，因为C,A,w都不是B的客户，因此C无法获知CBAw路径的存在：<strong>每个ISP感知到的网络和真实不一致</strong>，C可能会通过CAw（而不是使用B）最终路由到w</p>
+<h3 id="BGP-or-OSRF"><a href="#BGP-or-OSRF" class="headerlink" title="BGP or OSRF"></a>BGP or OSRF</h3><p>为什么内部网关协议和外部网关协议如此不同？</p>
+<h4 id="策略"><a href="#策略" class="headerlink" title="策略"></a>策略</h4><ul>
+<li><strong>Inter-AS</strong>：管理员需要控制通信路径，谁在使用它的网络进行数据传输</li>
+<li><strong>Intra-AS</strong>：只有一个管理者，所以无需策略，让AS内部的各子网的主机尽可能地利用资源进行快速路由</li>
+</ul>
+<h4 id="规模"><a href="#规模" class="headerlink" title="规模"></a>规模</h4><ul>
+<li><p>AS间路由必须考虑规模问题，以便支持全网的数据转发</p>
+</li>
+<li><p>AS内部路由规模不是一个大的问题</p>
+<p>如果AS 太大，可将此AS分成小的AS。规模依旧是可控的，AS之间只不过多了一个点而已。或者AS内部路由支持层次性，层次性路由节约了表空间, 降低了更新的数据流量</p>
+</li>
+</ul>
+<h4 id="性能"><a href="#性能" class="headerlink" title="性能"></a>性能</h4><ul>
+<li><strong>Intra-AS</strong>：关注性能</li>
+<li><strong>Inter-AS</strong>：策略可能比性能更重要</li>
+</ul>
+<h2 id="SDN控制平面"><a href="#SDN控制平面" class="headerlink" title="SDN控制平面"></a>SDN控制平面</h2><h3 id="导论"><a href="#导论" class="headerlink" title="导论"></a>导论</h3><p>前面在介绍<a href="#%E9%80%9A%E7%94%A8%E8%BD%AC%E5%8F%91%E5%92%8CSDN">网络层数据平面 - 通用转发和SDN</a>的时候，我们简单介绍了一下SDN的架构可以分为数据平面交换机，SDN控制器以及控制应用。本节将会详细介绍SDN的控制器。</p>
+<h4 id="SDN控制器里的元件"><a href="#SDN控制器里的元件" class="headerlink" title="SDN控制器里的元件"></a>SDN控制器里的元件</h4><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673433974780.png" alt="1673433974780"></p>
+<h3 id="OpenFlow协议"><a href="#OpenFlow协议" class="headerlink" title="OpenFlow协议"></a>OpenFlow协议</h3><p>OpenFlow协议是控制器和SDN交换机交互的协议，采用TCP来交换报文（加密可选），OpenFlow共有三种报文类型：</p>
+<ul>
+<li>控制器 -&gt; 交换机</li>
+<li>异步（交换机 -&gt; 控制器 ）</li>
+<li>对称（misc）</li>
+</ul>
+<h4 id="OpenFlow控制器-交换机报文"><a href="#OpenFlow控制器-交换机报文" class="headerlink" title="OpenFlow控制器-交换机报文"></a>OpenFlow控制器-交换机报文</h4><p>一些关键的控制器到交换机使用的报文</p>
+<ul>
+<li><strong>特性</strong>：控制器查询交换机特性，交换机应答</li>
+<li><strong>配置</strong>：交换机查询&#x2F;设置交换机的配置参数</li>
+<li><strong>修改状态</strong>：增加删除修改OpenFlow表中的流表</li>
+<li><strong>packet-out</strong>：控制器可以将分组通过特定的端口发出</li>
+<li><strong>分组进入</strong>：将分组（和它的控制）传给控制器，见来自控制器的packet-out报文</li>
+<li><strong>流移除：</strong>在交换机上删除流表项</li>
+<li><strong>端口状态：</strong>通告控制器端口的变化</li>
+</ul>
+<p>幸运的是，网络管理员不需要直接通过创建&#x2F;发送流表来编程交换机，而是采用在控制器上的app自动运算和配置</p>
+<h3 id="控制-x2F-数据平面交互的例子"><a href="#控制-x2F-数据平面交互的例子" class="headerlink" title="控制 &#x2F; 数据平面交互的例子"></a>控制 &#x2F; 数据平面交互的例子</h3><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673434585721.png" alt="1673434585721"></p>
+<ol>
+<li>S1经历了链路失效，采用OpenFlow报文通告控制器：端口状态报文</li>
+<li>SDN控制器接收OpenFlow报文，更新链路状态信息</li>
+<li>Dijkstra路由算法应用被调用（前面注册过这个状态变化消息）</li>
+<li>Dijkstra路由算法访问控制器中的网络拓扑信息，链路状态信息计算新路由</li>
+<li>链路状态路由app和SDN控制器中流表计算元件交互，计算出新的所需流表</li>
+<li>控制器采用OpenFlow在交换机上安装新的需要更新的流表</li>
+</ol>
+<h3 id="OpenDaylight-ODL-控制器"><a href="#OpenDaylight-ODL-控制器" class="headerlink" title="OpenDaylight(ODL)控制器"></a>OpenDaylight(ODL)控制器</h3><p><img src="/2023/09/12/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2/1673434771942.png" alt="1673434771942"></p>
+<p>ODL Lithium控制器，可以使网络应用可以在SDN或者外面，通过服务抽象层SAL：和内部以及外部的应用以及服务进行交互。控制应用和控制器分离（应用app在控制器外部）</p>
+<ul>
+<li>意图框架：服务的高级规范，描述是什么而不是如何做</li>
+</ul>
+<p>ODL Lithium控制器使相当多的重点聚焦在分布式核心上， 以提高服务的可靠性，性能的可扩展性</p>
+<h3 id="SDN面临的挑战"><a href="#SDN面临的挑战" class="headerlink" title="SDN面临的挑战"></a>SDN面临的挑战</h3><ol>
+<li><p>强化控制平面：可信、可靠、性能可扩展性、安全的分布式系统</p>
+<ul>
+<li>对于失效的鲁棒性： 利用为控制平面可靠分布式系统的强大理论 </li>
+<li>可信任，安全：从开始就进行铸造</li>
+</ul>
+</li>
+<li><p>网络、协议满足特殊任务的需求</p>
+<p>e.g.，实时性，超高可靠性、超高安全性</p>
+</li>
+<li><p>互联网络范围内的扩展性</p>
+<p>全网部署，而不是仅仅在一个AS的内部部署</p>
+</li>
+</ol>
+<h2 id="ICMP"><a href="#ICMP" class="headerlink" title="ICMP"></a>ICMP</h2><p>ICMP: Internet Control Message Protocol 因特网控制报文协议，由主机、路由器、网关用于传达网络层控制信息：</p>
+<ul>
+<li>错误报告：主机不可到达、 网络、端口、协议</li>
+<li>Echo 请求和回复（ping）</li>
+</ul>
+<p>ICMP处在网络层，但是是在IP协议的上面，ICMP消息由IP数据报承载</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BD%91%E7%BB%9C/" rel="tag"># 计算机网络</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2023/08/30/%E7%BD%91%E7%BB%9C%E5%B1%82%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2/" rel="prev" title="网络层 - 数据平面">
+      <i class="fa fa-chevron-left"></i> 网络层 - 数据平面
+    </a></div>
+      <div class="post-nav-item"></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E7%BD%91%E7%BB%9C%E5%B1%82-%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2"><span class="nav-number">1.</span> <span class="nav-text">网络层 - 控制平面</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.</span> <span class="nav-text">路由选择算法</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%EF%BC%88route%EF%BC%89%E7%9A%84%E6%A6%82%E5%BF%B5"><span class="nav-number">1.1.1.</span> <span class="nav-text">路由（route）的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9%E7%AE%97%E6%B3%95%E7%9A%84%E5%8E%9F%E5%88%99"><span class="nav-number">1.1.2.</span> <span class="nav-text">路由选择算法的原则</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9%E7%AE%97%E6%B3%95%E5%88%86%E7%B1%BB"><span class="nav-number">1.1.3.</span> <span class="nav-text">路由选择算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%89%E5%85%A8%E5%B1%80%E6%88%96%E5%88%86%E5%B8%83%E5%BC%8F%E5%88%86%E7%B1%BB"><span class="nav-number">1.1.3.1.</span> <span class="nav-text">按全局或分布式分类</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%8C%89%E9%9D%99%E6%80%81%E6%88%96%E5%8A%A8%E6%80%81%E5%88%86%E7%B1%BB"><span class="nav-number">1.1.3.2.</span> <span class="nav-text">按静态或动态分类</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E9%93%BE%E8%B7%AF%E7%8A%B6%E6%80%81%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9-link-state-routing"><span class="nav-number">1.1.4.</span> <span class="nav-text">链路状态路由选择(link state routing)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E5%B7%A5%E4%BD%9C%E8%BF%87%E7%A8%8B"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">基本工作过程</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LS%E7%9A%84%E5%BA%94%E7%94%A8%E6%83%85%E5%86%B5"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">LS的应用情况</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#LS%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9%E7%AE%97%E6%B3%95%E7%9A%84%E5%B7%A5%E4%BD%9C%E5%8E%9F%E7%90%86"><span class="nav-number">1.1.4.3.</span> <span class="nav-text">LS路由选择算法的工作原理</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Dijkstra%E7%AE%97%E6%B3%95%E6%80%BB%E7%BB%93"><span class="nav-number">1.1.4.4.</span> <span class="nav-text">Dijkstra算法总结</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E5%A4%8D%E6%9D%82%E5%BA%A6"><span class="nav-number">1.1.4.4.1.</span> <span class="nav-text">算法复杂度</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%8F%AF%E8%83%BD%E7%9A%84%E9%9C%87%E8%8D%A1"><span class="nav-number">1.1.4.4.2.</span> <span class="nav-text">可能的震荡</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E7%9F%A2%E9%87%8F%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9-distance-vector-routing"><span class="nav-number">1.1.5.</span> <span class="nav-text">距离矢量路由选择(distance vector routing)</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%9F%BA%E6%9C%AC%E6%80%9D%E6%83%B3"><span class="nav-number">1.1.5.1.</span> <span class="nav-text">基本思想</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%9D%E7%A6%BB%E7%9F%A2%E9%87%8F%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.5.2.</span> <span class="nav-text">距离矢量算法</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%A0%B8%E5%BF%83%E6%80%9D%E8%B7%AF"><span class="nav-number">1.1.5.2.1.</span> <span class="nav-text">核心思路</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#DV%E7%9A%84%E6%97%A0%E7%A9%B7%E8%AE%A1%E7%AE%97%E9%97%AE%E9%A2%98"><span class="nav-number">1.1.5.2.2.</span> <span class="nav-text">DV的无穷计算问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#%E6%B0%B4%E5%B9%B3%E5%88%86%E8%A3%82-split-horizon-%E7%AE%97%E6%B3%95"><span class="nav-number">1.1.5.2.3.</span> <span class="nav-text">水平分裂(split horizon)算法</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#%E7%AE%97%E6%B3%95%E6%8F%8F%E8%BF%B0"><span class="nav-number">1.1.5.2.3.1.</span> <span class="nav-text">算法描述</span></a></li></ol></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LS%E5%92%8CDS%E7%AE%97%E6%B3%95%E7%9A%84%E6%AF%94%E8%BE%83"><span class="nav-number">1.1.6.</span> <span class="nav-text">LS和DS算法的比较</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%9B%A0%E7%89%B9%E7%BD%91%E4%B8%AD%E8%87%AA%E6%B2%BB%E7%B3%BB%E7%BB%9F%E5%86%85%E9%83%A8%E7%9A%84%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9"><span class="nav-number">1.2.</span> <span class="nav-text">因特网中自治系统内部的路由选择</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E8%B7%AF%E7%94%B1%E4%BF%A1%E6%81%AF%E5%8D%8F%E8%AE%AE-RIP"><span class="nav-number">1.2.1.</span> <span class="nav-text">路由信息协议 - RIP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#RIP%E9%93%BE%E8%B7%AF%E5%A4%B1%E6%95%88%E5%92%8C%E6%81%A2%E5%A4%8D"><span class="nav-number">1.2.1.1.</span> <span class="nav-text">RIP链路失效和恢复</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#RIP%E8%BF%9B%E7%A8%8B%E5%A4%84%E7%90%86"><span class="nav-number">1.2.1.2.</span> <span class="nav-text">RIP进程处理</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%BC%80%E6%94%BE%E6%9C%80%E7%9F%AD%E8%B7%AF%E4%BC%98%E5%85%88-OSRF"><span class="nav-number">1.2.2.</span> <span class="nav-text">开放最短路优先 - OSRF</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#OSRF%E2%80%9C%E9%AB%98%E7%BA%A7%E2%80%9D%E7%89%B9%E6%80%A7-RIP%E4%B8%8D%E5%85%B7%E5%A4%87"><span class="nav-number">1.2.2.1.</span> <span class="nav-text">OSRF“高级”特性(RIP不具备)</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E5%8C%96%E7%9A%84OSRF%E8%B7%AF%E7%94%B1"><span class="nav-number">1.2.2.2.</span> <span class="nav-text">层次化的OSRF路由</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ISP%E4%B9%8B%E9%97%B4%E7%9A%84%E8%B7%AF%E7%94%B1%E9%80%89%E6%8B%A9%EF%BC%9ABGP"><span class="nav-number">1.3.</span> <span class="nav-text">ISP之间的路由选择：BGP</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E8%B7%AF%E7%94%B1"><span class="nav-number">1.3.1.</span> <span class="nav-text">层次路由</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B9%B3%E9%9D%A2%E8%B7%AF%E7%94%B1"><span class="nav-number">1.3.1.1.</span> <span class="nav-text">平面路由</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B9%B3%E9%9D%A2%E8%B7%AF%E7%94%B1%E7%9A%84%E9%97%AE%E9%A2%98"><span class="nav-number">1.3.1.1.1.</span> <span class="nav-text">平面路由的问题</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E8%B7%AF%E7%94%B1-1"><span class="nav-number">1.3.1.2.</span> <span class="nav-text">层次路由</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%B1%82%E6%AC%A1%E8%B7%AF%E7%94%B1%E7%9A%84%E4%BC%98%E7%82%B9"><span class="nav-number">1.3.1.2.1.</span> <span class="nav-text">层次路由的优点</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E4%BA%92%E8%81%94%E7%BD%91AS%E9%97%B4%E7%9A%84%E8%B7%AF%E7%94%B1%EF%BC%9ABGP"><span class="nav-number">1.3.2.</span> <span class="nav-text">互联网AS间的路由：BGP</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#eBGP%E3%80%81iBGP%E8%BF%9E%E6%8E%A5"><span class="nav-number">1.3.2.1.</span> <span class="nav-text">eBGP、iBGP连接</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%B7%AF%E5%BE%84%E7%9A%84%E5%B1%9E%E6%80%A7%E5%8F%8ABGP%E8%B7%AF%E7%94%B1"><span class="nav-number">1.3.2.2.</span> <span class="nav-text">路径的属性及BGP路由</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#%E5%9F%BA%E4%BA%8E%E7%AD%96%E7%95%A5%E7%9A%84%E8%B7%AF%E7%94%B1"><span class="nav-number">1.3.2.2.1.</span> <span class="nav-text">基于策略的路由</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BGP%E8%B7%AF%E5%BE%84%E9%80%9A%E5%91%8A"><span class="nav-number">1.3.2.3.</span> <span class="nav-text">BGP路径通告</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#BGP%E6%8A%A5%E6%96%87"><span class="nav-number">1.3.2.4.</span> <span class="nav-text">BGP报文</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BGP%E5%92%8COSRF%E8%BD%AC%E5%8F%91%E8%A1%A8%E8%A1%A8%E9%A1%B9"><span class="nav-number">1.4.</span> <span class="nav-text">BGP和OSRF转发表表项</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BGP%E8%B7%AF%E5%BE%84%E9%80%89%E6%8B%A9"><span class="nav-number">1.4.1.</span> <span class="nav-text">BGP路径选择</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%83%AD%E5%9C%9F%E8%B1%86%E8%B7%AF%E7%94%B1"><span class="nav-number">1.4.1.1.</span> <span class="nav-text">热土豆路由</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGP-%E9%80%9A%E8%BF%87%E8%B7%AF%E5%BE%84%E9%80%9A%E5%91%8A%E6%89%A7%E8%A1%8C%E7%AD%96%E7%95%A5"><span class="nav-number">1.4.2.</span> <span class="nav-text">BGP: 通过路径通告执行策略</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BGP-or-OSRF"><span class="nav-number">1.4.3.</span> <span class="nav-text">BGP or OSRF</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#%E7%AD%96%E7%95%A5"><span class="nav-number">1.4.3.1.</span> <span class="nav-text">策略</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E8%A7%84%E6%A8%A1"><span class="nav-number">1.4.3.2.</span> <span class="nav-text">规模</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#%E6%80%A7%E8%83%BD"><span class="nav-number">1.4.3.3.</span> <span class="nav-text">性能</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SDN%E6%8E%A7%E5%88%B6%E5%B9%B3%E9%9D%A2"><span class="nav-number">1.5.</span> <span class="nav-text">SDN控制平面</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#%E5%AF%BC%E8%AE%BA"><span class="nav-number">1.5.1.</span> <span class="nav-text">导论</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#SDN%E6%8E%A7%E5%88%B6%E5%99%A8%E9%87%8C%E7%9A%84%E5%85%83%E4%BB%B6"><span class="nav-number">1.5.1.1.</span> <span class="nav-text">SDN控制器里的元件</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenFlow%E5%8D%8F%E8%AE%AE"><span class="nav-number">1.5.2.</span> <span class="nav-text">OpenFlow协议</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#OpenFlow%E6%8E%A7%E5%88%B6%E5%99%A8-%E4%BA%A4%E6%8D%A2%E6%9C%BA%E6%8A%A5%E6%96%87"><span class="nav-number">1.5.2.1.</span> <span class="nav-text">OpenFlow控制器-交换机报文</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6-x2F-%E6%95%B0%E6%8D%AE%E5%B9%B3%E9%9D%A2%E4%BA%A4%E4%BA%92%E7%9A%84%E4%BE%8B%E5%AD%90"><span class="nav-number">1.5.3.</span> <span class="nav-text">控制 &#x2F; 数据平面交互的例子</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#OpenDaylight-ODL-%E6%8E%A7%E5%88%B6%E5%99%A8"><span class="nav-number">1.5.4.</span> <span class="nav-text">OpenDaylight(ODL)控制器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#SDN%E9%9D%A2%E4%B8%B4%E7%9A%84%E6%8C%91%E6%88%98"><span class="nav-number">1.5.5.</span> <span class="nav-text">SDN面临的挑战</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#ICMP"><span class="nav-number">1.6.</span> <span class="nav-text">ICMP</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">mazuchang</p>
+  <div class="site-description" itemprop="description">前行纵然步履维艰，你仍旧走在正确的道路上。</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">8</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2024</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mazuchang</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> & <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> 强力驱动
+  </div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
